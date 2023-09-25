@@ -1,7 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
-import tourRouter from './routes/tours.js';
-import userRouter from './routes/users.js';
+import tourRouter from './routes/tourRoutes.js';
+import userRouter from './routes/userRoutes.js';
 import { STATIC_FOLDER } from './paths.js';
 const app = express();
 //MIDDLEWARES

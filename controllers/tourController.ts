@@ -1,82 +1,102 @@
 import { NextFunction, Request, Response } from 'express';
-import { tours } from '../initialize.js';
-import { __rootdirname } from '../paths.js';
-// import { Tour } from '../utils/types.js';
-import fs from 'node:fs';
-import { TOURS_SIMPLE } from '../paths.js';
-import { JSEND } from '../utils/types.js';
 import Tour from '../models/tourModel.js';
+import { JSEND } from '../utils/types.js';
+export const getAllTours = async (req: Request, res: Response) => {
+  const query = req.query;
+  try {
+    let filteredTours = await Tour.find(req.query);
 
-export const checkID = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-  val: any
-) => {
-  const id = Number(req.params.id);
-  const tour = tours.find((el) => el.id === id);
+    const data: JSEND = {
+      status: 'success',
+      results: filteredTours.length,
+      data: {
+        tour: filteredTours,
+      },
+    };
 
-  if (!tour) {
-    return res.status(404).json({
+    return res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({
       status: 'fail',
-      message: 'Invalid ID',
+      message: error,
     });
   }
-
-  req.payload = { tour };
-
-  next();
 };
 
-export const checkBody = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.body?.name || !req.body?.price) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Incomplete data sent.' });
+export const getTour = async (req: Request, res: Response) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+
+    const data: JSEND = {
+      status: 'success',
+      data: {
+        tour,
+      },
+    };
+
+    return res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
   }
-
-  next();
 };
 
-export const getAllTours = (req: Request, res: Response) => {
-  return res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: { tours },
-  });
+export const createTour = async (req: Request, res: Response) => {
+  try {
+    const newTour = await Tour.create(req.body);
+    const data: JSEND = {
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    };
+    res.status(201).json(data);
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Bad request.',
+    });
+  }
 };
 
-export const getTour = (req: Request, res: Response) =>
-  res.status(200).json({ status: 'success', data: req.payload.tour });
+export const updateTour = async (req: Request, res: Response) => {
+  try {
+    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-export const createTour = (req: Request, res: Response) => {
-  const newId: number = tours.length;
-  const newTour: Tour = Object.assign({ id: newId }, req.body);
+    const data: JSEND = {
+      status: 'success',
+      data: {
+        tour: updatedTour,
+      },
+    };
 
-  tours.push(newTour);
-
-  fs.writeFile(TOURS_SIMPLE, JSON.stringify(tours), (err) => {
-    if (err) {
-      res.status(500).send('Something went wrong.');
-    } else {
-      const data: JSEND = {
-        status: 'success',
-        data: {
-          tours: newTour,
-        },
-      };
-      res.status(201).json(data);
-    }
-  });
+    return res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };
 
-export const updateTour = (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({ status: 'success', data: { ...req.payload.tour, ...req.body } });
-};
+export const deleteTour = async (req: Request, res: Response) => {
+  try {
+    await Tour.findByIdAndDelete(req.params.id);
 
-export const deleteTour = (req: Request, res: Response) => {
-  res.status(204).json({ status: 'success', data: null });
+    const data: JSEND = {
+      status: 'success',
+    };
+
+    return res.status(204).json(data);
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      message: error,
+    });
+  }
 };

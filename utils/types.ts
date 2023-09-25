@@ -18,5 +18,6 @@ export type Tour = {
 
 export type JSEND = {
   status: string;
-  data: { [key: string]: any };
+  results?: number;
+  data?: { [key: string]: any };
 };
