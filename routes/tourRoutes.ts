@@ -5,9 +5,15 @@ import {
   deleteTour,
   getAllTours,
   createTour,
+  aliasTop,
+  getTourStats,
 } from '../controllers/tourController.js';
 
 const router = express.Router();
+
+router.route('/top5').get(aliasTop, getAllTours);
+
+router.route('/stats').get(getTourStats);
 
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
