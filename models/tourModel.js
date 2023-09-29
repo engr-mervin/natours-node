@@ -1,4 +1,5 @@
 import mongoose from '../mongooseClient.js';
+import slugify from 'slugify';
 const tourSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -50,6 +51,44 @@ const tourSchema = new mongoose.Schema({
         default: Date.now(),
     },
     startDates: [Date],
+    slug: String,
+    secretTour: {
+        type: Boolean,
+        default: false,
+    },
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+});
+tourSchema.virtual('durationWeeks').get(function () {
+    return this.duration / 7;
+});
+//DOCUMENT MIDDLEWARE: runs before .save() and .create()
+tourSchema.pre('save', function (next) {
+    this.slug = slugify(this.name, { lower: true });
+    next();
+});
+//runs after save
+tourSchema.post('save', function (doc, next) {
+    console.log(doc);
+    next();
+});
+//QUERY MIDDLEWARE:
+tourSchema.pre(/^find/, function (next) {
+    this.find({ secretTour: { $ne: true } });
+    this.startTime = performance.now();
+    this.start = Date.now();
+    next();
+});
+tourSchema.post(/^find/, function (docs, next) {
+    console.log(`The query took: ${performance.now() - this.startTime} ms`);
+    console.log(`The query took: ${Date.now() - this.start} ms`);
+    next();
+});
+//AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+    this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+    next();
 });
 const Tour = mongoose.model('Tour', tourSchema);
 export default Tour;

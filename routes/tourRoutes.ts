@@ -7,11 +7,14 @@ import {
   createTour,
   aliasTop,
   getTourStats,
+  getMonthlyPlan,
 } from '../controllers/tourController.js';
 
 const router = express.Router();
 
 router.route('/top5').get(aliasTop, getAllTours);
+
+router.route('/monthly/:year').get(getMonthlyPlan);
 
 router.route('/stats').get(getTourStats);
 
