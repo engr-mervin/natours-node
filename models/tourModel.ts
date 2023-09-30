@@ -1,6 +1,6 @@
-import { Document } from 'mongoose';
 import mongoose from '../mongooseClient.js';
 import slugify from 'slugify';
+import { validator } from '../utils/validators.js';
 
 const tourSchema = new mongoose.Schema(
   {
@@ -9,6 +9,12 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       unique: true,
       trim: true,
+      maxlength: [40, 'A tour name must have at most 10 Characters'],
+      minlength: [10, 'A tour name must have at least 10 characters'],
+      validate: {
+        validator: validator(/^[A-Za-z ]+$/),
+        message: 'Name should only be alphabetical characters',
+      },
     },
     duration: {
       type: Number,
@@ -21,10 +27,16 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Difficulty is either easy, medium or difficult.',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'Rating should be at least 1.0'],
+      max: [5, 'Rating should be at most 5.0'],
     },
     ratingsQuantity: {
       type: Number,
@@ -34,7 +46,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val: number) {
+          //'this' only exists on create Tour, but not on update Tour
+          return val <= this.price;
+        },
+        message: `Discount price ({VALUE}) should be below regular price.`,
+      },
+    },
     summary: {
       type: String,
       trim: true,
