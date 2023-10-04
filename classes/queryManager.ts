@@ -60,7 +60,7 @@ import {
   DEFAULT_DOCUMENTS_PER_PAGE,
   DEFAULT_FIELDS,
   DEFAULT_SORT_FIELD,
-} from './constants.js';
+} from '../utils/constants.js';
 
 export class QueryManager {
   query: Query<any, any>;
