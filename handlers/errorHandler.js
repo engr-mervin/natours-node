@@ -3,7 +3,17 @@ const processMongoDBErrors = function (err) {
     if (err.name === 'CastError') {
         return new CustomError(`The value of ${err.value} for ${err.path} is invalid`, 400);
     }
-    return new CustomError('');
+    if (err.code === 11000) {
+        const entries = Object.entries(err.keyValue);
+        return new CustomError(`The value of: ${entries[0][1]} for field:${entries[0][0]} already exists.`, 400);
+    }
+    if (err.name === 'ValidationError') {
+        const errorMessages = Object.values(err.errors)
+            .map((el) => el.message)
+            .join('. ');
+        return new CustomError(err, 400);
+    }
+    return new CustomError(err);
 };
 const sendErrorDev = function (err, res) {
     res.status(err.statusCode).json({

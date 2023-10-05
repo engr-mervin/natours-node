@@ -8,8 +8,22 @@ const processMongoDBErrors = function (err: Error | CustomError | any) {
       400
     );
   }
+  if (err.code === 11000) {
+    const entries = Object.entries(err.keyValue);
+    return new CustomError(
+      `The value of: ${entries[0][1]} for field:${entries[0][0]} already exists.`,
+      400
+    );
+  }
 
-  return new CustomError('');
+  if (err.name === 'ValidationError') {
+    const errorMessages = Object.values(err.errors)
+      .map((el: any) => el.message)
+      .join('. ');
+    return new CustomError(err, 400);
+  }
+
+  return new CustomError(err);
 };
 
 const sendErrorDev = function (err: CustomError, res: Response) {

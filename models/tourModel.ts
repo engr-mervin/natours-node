@@ -1,3 +1,4 @@
+//@ts-nocheck
 import mongoose from '../mongooseClient.js';
 import slugify from 'slugify';
 import { validator } from '../utils/validators.js';
