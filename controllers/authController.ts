@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
+import { promisify } from 'util';
 
 const signToken = function (id: any) {
   return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET!, {
@@ -72,4 +73,59 @@ export const login = catchAsync(async function (
     status: 'success',
     token,
   });
+});
+
+export const protect = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  //check request if it contains a JWT
+  if (
+    !req.headers.authorization ||
+    !req.headers.authorization.startsWith('Bearer')
+  ) {
+    throw new CustomError(
+      'You are not logged in, please log in to get access.',
+      401
+    );
+  }
+
+  const token = req.headers.authorization.split(' ')[1];
+
+  if (!token) {
+    throw new CustomError('Invalid user credentials.', 401);
+  }
+
+  //verify the JWT
+
+  const payload: any = jwt.verify(
+    token,
+    process.env.JSONWEBTOKEN_SECRET!,
+    (error, payload) => {
+      if (error) throw error;
+
+      return payload;
+    }
+  );
+
+  console.log(payload);
+
+  //if verified get the user
+
+  const candidateUser: any = await User.findById(payload.id);
+  if (candidateUser === undefined || candidateUser === null) {
+    throw new CustomError('User does not exist.', 401);
+  }
+  const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
+  console.log(isModified);
+
+  if (isModified) {
+    throw new CustomError(
+      'Token is no longer valid. Please log in again.',
+      401
+    );
+  }
+
+  next();
 });

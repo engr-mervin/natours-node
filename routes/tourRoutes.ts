@@ -9,6 +9,7 @@ import {
   getTourStats,
   getMonthlyPlan,
 } from '../controllers/tourController.js';
+import { protect } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -20,6 +21,6 @@ router.route('/stats').get(getTourStats);
 
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
 
-router.route('/').get(getAllTours).post(createTour);
+router.route('/').get(protect, getAllTours).post(createTour);
 
 export default router;

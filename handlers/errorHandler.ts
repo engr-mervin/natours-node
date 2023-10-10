@@ -23,7 +23,19 @@ const processMongoDBErrors = function (err: Error | CustomError | any) {
     return new CustomError(err, 400);
   }
 
-  return new CustomError(err);
+  return err;
+};
+
+const processJWTErrors = function (err: Error | CustomError) {
+  if (err.name === 'JsonWebTokenError') {
+    return new CustomError('Invalid web token', 401);
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    return new CustomError('Web token already expired', 401);
+  }
+
+  return new CustomError('Something went wrong', 500);
 };
 
 const sendErrorDev = function (err: CustomError, res: Response) {
@@ -64,7 +76,8 @@ export const errorHandler = (
   }
 
   if (process.env.NODE_ENV === 'production') {
-    const error = processMongoDBErrors(err);
+    let error = processMongoDBErrors(err);
+    error = processJWTErrors(error);
     sendErrorProd(error, res);
   }
 };

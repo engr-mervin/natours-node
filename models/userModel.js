@@ -39,18 +39,21 @@ const userSchema = new mongoose.Schema({
             message: 'The passwords do not match.',
         },
     },
+    lastPasswordModification: {
+        type: Date,
+    },
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 userSchema.pre('save', async function (next) {
     if (this.isModified('password') === false) {
         return next();
     }
-    console.log(argon2);
     let password = this.password;
-    console.log(password);
     try {
         password = await argon2.hash(password, { type: 2 });
         this.password = password;
         this.passwordConfirm = undefined;
+        //FOR MODIFICATION
+        this.lastPasswordModification = Date.now();
         next();
     }
     catch (error) {
@@ -63,6 +66,15 @@ userSchema.methods.passwordsMatch = async function (candidatePassword) {
         type: 2,
     });
     return result;
+};
+userSchema.methods.passwordModifiedAfter = async function (jwtStamp) {
+    if (this.lastPasswordModification) {
+        const timeStamp = parseInt(this.lastPasswordModification.getTime() / 1000, 10);
+        console.log(timeStamp, jwtStamp);
+        if (timeStamp > jwtStamp)
+            return true;
+    }
+    return false;
 };
 const User = mongoose.model('User', userSchema);
 export default User;
