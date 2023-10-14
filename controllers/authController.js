@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
+import { sendEmail } from '../utils/email.js';
 const signToken = function (id) {
     return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET, {
         expiresIn: process.env.JSONWEBTOKEN_EXPIRY,
@@ -65,7 +66,6 @@ export const protect = catchAsync(async function (req, res, next) {
             throw error;
         return payload;
     });
-    console.log(payload);
     //if verified get the user
     const candidateUser = await User.findById(payload.id);
     if (candidateUser === undefined || candidateUser === null) {
@@ -76,5 +76,46 @@ export const protect = catchAsync(async function (req, res, next) {
     if (isModified) {
         throw new CustomError('Token is no longer valid. Please log in again.', 401);
     }
+    req.user = candidateUser;
     next();
 });
+export const restrict = function (authorizedRoles) {
+    return catchAsync(async function (req, res, next) {
+        if (!authorizedRoles.includes(req.user.role)) {
+            throw new CustomError('You are unauthorized to perform this action.', 403);
+        }
+        next();
+    });
+};
+export const passwordForgotten = catchAsync(async function (req, res, next) {
+    console.log(req.body.email);
+    //Get user
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        throw new CustomError('User is not registered', 404);
+    }
+    //Generate email token
+    const resetToken = await user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+    //send it to users email
+    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const message = `Forgot password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}\nIf you didn't forget your password, please ignore this email!`;
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Your password reset token valid for 10 mins.',
+            message,
+        });
+        res.status(200).json({
+            status: 'success',
+            message: 'Token sent to email!',
+        });
+    }
+    catch (error) {
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+        throw new CustomError('There was an error sending the reset password email, try again later!', 500);
+    }
+});
+export const passwordReset = catchAsync(async function (req, res, next) { });
