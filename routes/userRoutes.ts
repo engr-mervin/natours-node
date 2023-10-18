@@ -10,6 +10,8 @@ import {
   login,
   passwordForgotten,
   passwordReset,
+  passwordUpdate,
+  protect,
   signup,
 } from '../controllers/authController.js';
 
@@ -20,6 +22,8 @@ router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', passwordForgotten);
 router.patch('/resetPassword/:token', passwordReset);
+
+router.patch('/updatePassword', protect, passwordUpdate);
 
 router.route('/').get(getAllUsers).post(createUser);
 

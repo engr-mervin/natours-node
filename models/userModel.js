@@ -45,12 +45,13 @@ const userSchema = new mongoose.Schema({
             message: 'The passwords do not match.',
         },
     },
-    lastPasswordModification: {
+    passwordChangedAt: {
         type: Date,
     },
     passwordResetToken: String,
     passwordResetExpires: Date,
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+//save hashed password
 userSchema.pre('save', async function (next) {
     if (this.isModified('password') === false) {
         return next();
@@ -60,8 +61,6 @@ userSchema.pre('save', async function (next) {
         password = await argon2.hash(password, { type: 2 });
         this.password = password;
         this.passwordConfirm = undefined;
-        //FOR MODIFICATION
-        this.lastPasswordModification = Date.now();
         next();
     }
     catch (error) {
@@ -69,15 +68,27 @@ userSchema.pre('save', async function (next) {
         next(error);
     }
 });
+//Set last password modification time
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password') || this.isNew)
+        return next();
+    this.passwordChangedAt = Date.now() - 1000;
+    next();
+});
 userSchema.methods.passwordsMatch = async function (candidatePassword) {
     const result = await argon2.verify(this.password, candidatePassword, {
         type: 2,
     });
     return result;
 };
+userSchema.methods.passwordUpdate = async function (password, passwordConfirm) {
+    this.password = password;
+    this.passwordConfirm = passwordConfirm;
+    await user.save();
+};
 userSchema.methods.passwordModifiedAfter = async function (jwtStamp) {
-    if (this.lastPasswordModification) {
-        const timeStamp = parseInt(this.lastPasswordModification.getTime() / 1000, 10);
+    if (this.passwordChangedAt) {
+        const timeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
         console.log(timeStamp, jwtStamp);
         if (timeStamp > jwtStamp)
             return true;

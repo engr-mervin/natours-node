@@ -6,10 +6,25 @@ import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
 import { sendEmail } from '../utils/email.js';
+import crypto from 'crypto';
+import { stat } from 'fs/promises';
 
 const signToken = function (id: any) {
   return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET!, {
     expiresIn: process.env.JSONWEBTOKEN_EXPIRY!,
+  });
+};
+
+const createSendToken = function (
+  user: any,
+  statusCode: number,
+  res: Response
+) {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
   });
 };
 export const signup = catchAsync(async function (
@@ -24,12 +39,7 @@ export const signup = catchAsync(async function (
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(newUser, 201, res);
 });
 
 export const login = catchAsync(async function (
@@ -67,12 +77,7 @@ export const login = catchAsync(async function (
 
   //if it exists send a JWT
 
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 export const protect = catchAsync(async function (
@@ -116,7 +121,6 @@ export const protect = catchAsync(async function (
     throw new CustomError('User does not exist.', 401);
   }
   const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
-  console.log(isModified);
 
   if (isModified) {
     throw new CustomError(
@@ -199,4 +203,90 @@ export const passwordReset = catchAsync(async function (
   req: Request,
   res: Response,
   next: NextFunction
-) {});
+) {
+  //Get token
+  const resetToken = req.params.token;
+  if (!resetToken) {
+    throw new CustomError('Invalid reset password request.');
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  //Get user based on token
+
+  const user = await User.findOne({ passwordResetToken: hashedToken });
+
+  if (!user) {
+    throw new CustomError('Invalid password reset request token');
+  }
+
+  try {
+    //Check if token expiry is valid
+    if (!user.passwordResetExpires) {
+      throw new CustomError(
+        'Something went wrong with token generation, please try again later.'
+      );
+    }
+
+    //Check if token has expired
+    const hasExpired = Date.now() > user.passwordResetExpires.getTime();
+
+    if (hasExpired) {
+      throw new CustomError(
+        'This request has already expired. Please try again.'
+      );
+    }
+  } catch (error) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    throw error;
+  }
+
+  //set the new password
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  const jsonWebToken = signToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
+    token: jsonWebToken,
+  });
+});
+
+export const passwordUpdate = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  //then check if the user.password = req.body.password
+  const user: any = await User.findOne({ _id: req.user._id }).select(
+    '+password'
+  );
+  if (!user) {
+    throw new CustomError('User not found', 400);
+  }
+  const passwordValid = await user.passwordsMatch(req.body.currentPassword);
+
+  if (!passwordValid) {
+    throw new CustomError('Invalid current password.', 400);
+  }
+  //if it is correct
+  //update the password of the user
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
