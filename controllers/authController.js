@@ -2,8 +2,6 @@ import User from '../models/userModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
-import { validator } from '../utils/validators.js';
-import { EMAIL_REGEX } from '../utils/constants.js';
 import { sendEmail } from '../utils/email.js';
 import crypto from 'crypto';
 const signToken = function (id) {
@@ -13,6 +11,13 @@ const signToken = function (id) {
 };
 const createSendToken = function (user, statusCode, res) {
     const token = signToken(user._id);
+    const expiry = Number(process.env.JWT_COOKIE_EXPIRY) || 90;
+    const cookieOptions = {
+        expires: new Date(Date.now() + expiry * 86400 * 1000),
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+    };
+    res.cookie('jwt', token, cookieOptions);
     res.status(statusCode).json({
         status: 'success',
         token,
@@ -34,9 +39,9 @@ export const login = catchAsync(async function (req, res, next) {
         throw new CustomError('Please provide email and password!', 400);
     }
     //validate the email
-    if (!validator(EMAIL_REGEX)(email)) {
-        throw new CustomError('Email is invalid!', 400);
-    }
+    // if (!validator(EMAIL_REGEX)(email)) {
+    //   throw new CustomError('Email is invalid!', 400);
+    // }
     //get the hash of email from server
     const user = await User.findOne({ email }).select('+password');
     if (!user) {

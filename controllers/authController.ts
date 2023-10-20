@@ -21,6 +21,16 @@ const createSendToken = function (
 ) {
   const token = signToken(user._id);
 
+  const expiry: number = Number(process.env.JWT_COOKIE_EXPIRY) || 90;
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + expiry * 86400 * 1000),
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+  };
+
+  res.cookie('jwt', token, cookieOptions);
+
   res.status(statusCode).json({
     status: 'success',
     token,
@@ -55,9 +65,9 @@ export const login = catchAsync(async function (
   }
 
   //validate the email
-  if (!validator(EMAIL_REGEX)(email)) {
-    throw new CustomError('Email is invalid!', 400);
-  }
+  // if (!validator(EMAIL_REGEX)(email)) {
+  //   throw new CustomError('Email is invalid!', 400);
+  // }
 
   //get the hash of email from server
   const user: any = await User.findOne({ email }).select('+password');
