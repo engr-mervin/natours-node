@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 import Tour from './models/tourModel.js';
 
-const devData = await readFile('./dev-data/data/tours-simple.json', {
+const devData = await readFile('./dev-data/data/tours.json', {
   encoding: 'utf-8',
 });
 

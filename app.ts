@@ -9,7 +9,8 @@ import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
-import { xssFilter } from 'helmet';
+import xss from 'xss-clean';
+import hpp from 'hpp';
 
 const app = express();
 
@@ -37,7 +38,19 @@ app.use(express.json({ limit: '10kb' }));
 
 //sanitizers
 app.use(mongoSanitize());
-app.use(xssFilter());
+app.use(xss());
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 //Static folder
 app.use(express.static(STATIC_FOLDER));

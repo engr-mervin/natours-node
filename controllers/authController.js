@@ -2,6 +2,8 @@ import User from '../models/userModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
+import { validator } from '../utils/validators.js';
+import { EMAIL_REGEX } from '../utils/constants.js';
 import { sendEmail } from '../utils/email.js';
 import crypto from 'crypto';
 const signToken = function (id) {
@@ -21,6 +23,9 @@ const createSendToken = function (user, statusCode, res) {
     res.status(statusCode).json({
         status: 'success',
         token,
+        data: {
+            user,
+        },
     });
 };
 export const signup = catchAsync(async function (req, res, next) {
@@ -39,9 +44,9 @@ export const login = catchAsync(async function (req, res, next) {
         throw new CustomError('Please provide email and password!', 400);
     }
     //validate the email
-    // if (!validator(EMAIL_REGEX)(email)) {
-    //   throw new CustomError('Email is invalid!', 400);
-    // }
+    if (!validator(EMAIL_REGEX)(email)) {
+        throw new CustomError('Email is invalid!', 400);
+    }
     //get the hash of email from server
     const user = await User.findOne({ email }).select('+password');
     if (!user) {

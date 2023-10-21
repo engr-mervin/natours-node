@@ -34,6 +34,9 @@ const createSendToken = function (
   res.status(statusCode).json({
     status: 'success',
     token,
+    data: {
+      user,
+    },
   });
 };
 export const signup = catchAsync(async function (
@@ -65,9 +68,9 @@ export const login = catchAsync(async function (
   }
 
   //validate the email
-  // if (!validator(EMAIL_REGEX)(email)) {
-  //   throw new CustomError('Email is invalid!', 400);
-  // }
+  if (!validator(EMAIL_REGEX)(email)) {
+    throw new CustomError('Email is invalid!', 400);
+  }
 
   //get the hash of email from server
   const user: any = await User.findOne({ email }).select('+password');
