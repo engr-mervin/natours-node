@@ -2,7 +2,6 @@
 import mongoose from '../mongooseClient.js';
 import slugify from 'slugify';
 import { validator } from '../utils/validators.js';
-import User from './userModel.js';
 
 const tourSchema = new mongoose.Schema(
   {
@@ -11,7 +10,7 @@ const tourSchema = new mongoose.Schema(
       required: [true, 'A tour must have a name'],
       unique: true,
       trim: true,
-      maxlength: [40, 'A tour name must have at most 10 Characters'],
+      maxlength: [40, 'A tour name must have at most 40 Characters'],
       minlength: [10, 'A tour name must have at least 10 characters'],
       validate: {
         validator: validator(/^[A-Za-z ]+$/),
@@ -105,7 +104,7 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
   },
   {
     toJSON: { virtuals: true },
@@ -123,13 +122,14 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-tourSchema.pre('save', async function (next) {
-  const guidePromises = this.guides.map((id) => User.findById(id));
-  const guides = await Promise.all(guidePromises);
-  this.guides = guides;
+//embedding
+// tourSchema.pre('save', async function (next) {
+//   const guidePromises = this.guides.map((id) => User.findById(id));
+//   const guides = await Promise.all(guidePromises);
+//   this.guides = guides;
 
-  next();
-});
+//   next();
+// });
 
 //runs after save
 tourSchema.post('save', function (doc, next) {
@@ -142,6 +142,15 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.startTime = performance.now();
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
   next();
 });
 

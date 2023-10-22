@@ -1,6 +1,7 @@
 import express from 'express';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import reviewRouter from './routes/reviewRoutes.js';
 import { STATIC_FOLDER } from './paths.js';
 import { CustomError } from './classes/customError.js';
 import { errorHandler } from './handlers/errorHandler.js';
@@ -53,6 +54,7 @@ app.use((req, res, next) => {
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 app.all('*', (req, res, next) => {
     const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
     next(err);

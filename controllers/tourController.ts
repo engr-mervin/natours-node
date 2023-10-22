@@ -39,8 +39,7 @@ export const getTour = catchAsync(
     const tour = await Tour.findById(req.params.id);
 
     if (tour === null) {
-      const error404 = new CustomError('No tour found with that ID', 404);
-      return next(error404);
+      throw new CustomError('No tour found with that ID', 404);
     }
 
     const data: JSEND = {
@@ -139,9 +138,9 @@ export const getTourStats = catchAsync(async function (
     },
   ]);
 
-  res.status(400).json({
+  res.status(200).json({
     status: 'success',
-    message: stats,
+    data: { stats },
   });
 });
 

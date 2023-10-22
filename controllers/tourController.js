@@ -26,8 +26,7 @@ export const getAllTours = catchAsync(async (req, res, next) => {
 export const getTour = catchAsync(async (req, res, next) => {
     const tour = await Tour.findById(req.params.id);
     if (tour === null) {
-        const error404 = new CustomError('No tour found with that ID', 404);
-        return next(error404);
+        throw new CustomError('No tour found with that ID', 404);
     }
     const data = {
         status: 'success',
@@ -97,9 +96,9 @@ export const getTourStats = catchAsync(async function (req, res, next) {
             $sort: { minPrice: 1 },
         },
     ]);
-    res.status(400).json({
+    res.status(200).json({
         status: 'success',
-        message: stats,
+        data: { stats },
     });
 });
 export const getMonthlyPlan = catchAsync(async function (req, res, next) {
