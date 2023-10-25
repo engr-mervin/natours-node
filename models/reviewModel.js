@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { Schema, model } from 'mongoose';
 import { validator } from '../utils/validators.js';
 const reviewSchema = new Schema({
@@ -32,6 +33,16 @@ const reviewSchema = new Schema({
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+});
+reviewSchema.pre(/^find/, function (next) {
+    this.populate({
+        path: 'tour',
+        select: 'name',
+        options: {
+            review: true,
+        },
+    });
+    next();
 });
 const Review = model('Review', reviewSchema);
 export default Review;

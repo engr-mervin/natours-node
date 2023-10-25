@@ -7,7 +7,7 @@ export const getAllReviews = catchAsync(async function (
   res: Response,
   next: NextFunction
 ) {
-  const reviews = await Review.find({});
+  const reviews = await Review.find();
 
   res.status(200).json({
     status: 'success',
