@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { Schema, model } from 'mongoose';
 import { validator } from '../utils/validators.js';
+import { registerOrigin } from '../utils/query-helpers.js';
 
 const reviewSchema = new Schema(
   {
@@ -40,12 +41,14 @@ const reviewSchema = new Schema(
   }
 );
 
+reviewSchema.pre(/^find/, registerOrigin('review'));
+
 reviewSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'tour',
-    select: 'name',
+    path: 'user',
+    select: 'name photo',
     options: {
-      review: true,
+      origin: this.options.origin,
     },
   });
 

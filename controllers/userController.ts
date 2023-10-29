@@ -6,11 +6,20 @@ import { filterObject } from '../utils/objectFunctions.js';
 
 export const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const users = await User.find();
+    let users = await User.find();
 
-    res
-      .status(200)
-      .json({ status: 'success', results: users.length, data: { users } });
+    console.log(users);
+    const usersCleaned = JSON.parse(JSON.stringify(users)).map((el: any) => {
+      if (el.passwordChangedAt) delete el.passwordChangedAt;
+      return el;
+    });
+
+    console.log(usersCleaned);
+    res.status(200).json({
+      status: 'success',
+      results: users.length,
+      data: { usersCleaned },
+    });
   }
 );
 

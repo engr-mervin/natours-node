@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import mongoose from '../mongooseClient.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
+import { registerOrigin } from '../utils/query-helpers.js';
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -80,6 +81,7 @@ userSchema.pre('save', async function (next) {
     this.passwordChangedAt = Date.now() - 1000;
     next();
 });
+userSchema.pre(/^find/, registerOrigin('user'));
 userSchema.pre(/^find/, async function (next) {
     this.find({ isActive: { $ne: false } });
     next();

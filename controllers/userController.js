@@ -3,10 +3,19 @@ import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import { filterObject } from '../utils/objectFunctions.js';
 export const getAllUsers = catchAsync(async (req, res, next) => {
-    const users = await User.find();
-    res
-        .status(200)
-        .json({ status: 'success', results: users.length, data: { users } });
+    let users = await User.find();
+    console.log(users);
+    const usersCleaned = JSON.parse(JSON.stringify(users)).map((el) => {
+        if (el.passwordChangedAt)
+            delete el.passwordChangedAt;
+        return el;
+    });
+    console.log(usersCleaned);
+    res.status(200).json({
+        status: 'success',
+        results: users.length,
+        data: { usersCleaned },
+    });
 });
 export const updateMyInfo = catchAsync(async function (req, res, next) {
     if (req.body.password || req.body.passwordConfirm) {
