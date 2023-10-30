@@ -11,8 +11,11 @@ import {
 } from '../controllers/tourController.js';
 import { protect, restrict } from '../controllers/authController.js';
 import { DELETE_ACCESS } from '../utils/access-constants.js';
+import reviewRouter from './reviewRoutes.js';
 
 const router = express.Router();
+
+router.use('/:id/reviews', reviewRouter);
 
 router.route('/top5').get(aliasTop, getAllTours);
 
