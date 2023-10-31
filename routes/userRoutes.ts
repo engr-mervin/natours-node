@@ -14,8 +14,10 @@ import {
   passwordReset,
   passwordUpdate,
   protect,
+  restrict,
   signup,
 } from '../controllers/authController.js';
+import { ROLE_ADMIN } from '../utils/access-constants.js';
 
 const router = express.Router();
 
@@ -30,6 +32,10 @@ router.patch('/updateMyInfo', protect, updateMyInfo);
 router.delete('/deleteMyAccount', protect, deleteMyAccount);
 router.route('/').get(getAllUsers).post(createUser);
 
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+router
+  .route('/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(protect, restrict([ROLE_ADMIN]), deleteUser);
 
 export default router;

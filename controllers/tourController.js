@@ -2,6 +2,7 @@ import Tour from '../models/tourModel.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
+import { deleteOne, updateOne } from './genericController.js';
 export const getAllTours = catchAsync(async (req, res, next) => {
     //create a query
     let queryClass = new QueryManager(Tour.find(), req.query)
@@ -57,30 +58,8 @@ export const createTour = catchAsync(async (req, res, next) => {
     };
     res.status(201).json(data);
 });
-export const updateTour = catchAsync(async (req, res, next) => {
-    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-    });
-    const data = {
-        status: 'success',
-        data: {
-            tour: updatedTour,
-        },
-    };
-    return res.status(200).json(data);
-});
-export const deleteTour = catchAsync(async (req, res, next) => {
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-    if (tour === null) {
-        const error404 = new CustomError('No tour found with that ID', 404);
-        return next(error404);
-    }
-    const data = {
-        status: 'success',
-    };
-    return res.status(204).json(data);
-});
+export const updateTour = updateOne(Tour);
+export const deleteTour = deleteOne(Tour);
 export const getTourStats = catchAsync(async function (req, res, next) {
     const stats = await Tour.aggregate([
         {

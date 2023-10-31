@@ -2,6 +2,7 @@ import Review from '../models/reviewModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import Tour from '../models/tourModel.js';
+import { deleteOne } from './genericController.js';
 export const getAllReviews = catchAsync(async function (req, res, next) {
     const reviews = req.params.id
         ? await Review.find({ tour: req.params.id })
@@ -15,7 +16,7 @@ export const getAllReviews = catchAsync(async function (req, res, next) {
     });
 });
 export const getReviewById = catchAsync(async function (req, res, next) {
-    const review = await Review.findById(req.params.reviewId);
+    const review = await Review.findById(req.params.id);
     if (!review)
         throw new CustomError('Review not found', 404);
     res.status(200).json({
@@ -44,3 +45,4 @@ export const createReview = catchAsync(async function (req, res, next) {
         },
     });
 });
+export const deleteReview = deleteOne(Review);

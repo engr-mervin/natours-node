@@ -102,10 +102,7 @@ export const protect = catchAsync(async function (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith('Bearer')
   ) {
-    throw new CustomError(
-      'You are not logged in, please log in to get access.',
-      401
-    );
+    throw new CustomError('Please provide a valid auth token', 401);
   }
 
   const token = req.headers.authorization.split(' ')[1];

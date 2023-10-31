@@ -5,6 +5,7 @@ import { JSEND } from '../utils/types.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
+import { deleteOne, updateOne } from './genericController.js';
 
 export const getAllTours = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -83,40 +84,8 @@ export const createTour = catchAsync(
   }
 );
 
-export const updateTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    const data: JSEND = {
-      status: 'success',
-      data: {
-        tour: updatedTour,
-      },
-    };
-
-    return res.status(200).json(data);
-  }
-);
-
-export const deleteTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-
-    if (tour === null) {
-      const error404 = new CustomError('No tour found with that ID', 404);
-      return next(error404);
-    }
-
-    const data: JSEND = {
-      status: 'success',
-    };
-
-    return res.status(204).json(data);
-  }
-);
+export const updateTour = updateOne(Tour);
+export const deleteTour = deleteOne(Tour);
 
 export const getTourStats = catchAsync(async function (
   req: Request,

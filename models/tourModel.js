@@ -131,7 +131,6 @@ tourSchema.pre('save', function (next) {
 // });
 //runs after save
 tourSchema.post('save', function (doc, next) {
-    console.log(doc);
     next();
 });
 tourSchema.pre(/^find/, registerOrigin('tour'));
