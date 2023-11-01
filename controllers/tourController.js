@@ -2,7 +2,7 @@ import Tour from '../models/tourModel.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
-import { deleteOne, updateOne } from './genericController.js';
+import { createOne, deleteOne, updateOne } from './genericController.js';
 export const getAllTours = catchAsync(async (req, res, next) => {
     //create a query
     let queryClass = new QueryManager(Tour.find(), req.query)
@@ -48,16 +48,7 @@ export const aliasTop = async (req, res, next) => {
     req.query.fields = 'name price ratingsAverage summary difficulty';
     next();
 };
-export const createTour = catchAsync(async (req, res, next) => {
-    const newTour = await Tour.create(req.body);
-    const data = {
-        status: 'success',
-        data: {
-            tour: newTour,
-        },
-    };
-    res.status(201).json(data);
-});
+export const createTour = createOne(Tour);
 export const updateTour = updateOne(Tour);
 export const deleteTour = deleteOne(Tour);
 export const getTourStats = catchAsync(async function (req, res, next) {

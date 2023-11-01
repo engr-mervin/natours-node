@@ -3,7 +3,7 @@ import User from '../models/userModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import { filterObject } from '../utils/objectFunctions.js';
-import { deleteOne } from './genericController.js';
+import { createOne, deleteOne, updateOne } from './genericController.js';
 
 export const getAllUsers = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -87,19 +87,12 @@ export const deleteMyAccount = catchAsync(async function (
   res.status(204).json();
 });
 
-export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  res
-    .status(500)
-    .json({ status: 'err', message: 'This route is not yet defined!' });
-};
 export const getUser = (req: Request, res: Response, next: NextFunction) => {
   res
     .status(500)
     .json({ status: 'err', message: 'This route is not yet defined!' });
 };
-export const updateUser = (req: Request, res: Response, next: NextFunction) => {
-  res
-    .status(500)
-    .json({ status: 'err', message: 'This route is not yet defined!' });
-};
+
+export const createUser = createOne(User);
+export const updateUser = updateOne(User);
 export const deleteUser = deleteOne(User);

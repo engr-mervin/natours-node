@@ -97,7 +97,6 @@ export const restrict = function (authorizedRoles) {
     });
 };
 export const passwordForgotten = catchAsync(async function (req, res, next) {
-    console.log(req.body.email);
     //Get user
     const user = await User.findOne({ email: req.body.email });
     if (!user) {

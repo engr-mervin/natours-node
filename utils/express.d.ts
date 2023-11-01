@@ -1,5 +1,12 @@
 import { Request } from 'express';
+import { ObjectId } from 'mongoose';
 
+export enum Roles {
+  Admin = 'admin',
+  User = 'user',
+  Guide = 'guide',
+  LeadGuide = 'lead-guide',
+}
 declare global {
   namespace Express {
     interface Request {

@@ -5,7 +5,7 @@ import mongoose from '../mongooseClient.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
 import { registerOrigin } from '../utils/query-helpers.js';
-const userSchema = new mongoose.Schema({
+export const userSchema = new mongoose.Schema({
     name: {
         type: String,
         trim: true,

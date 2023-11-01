@@ -25,3 +25,37 @@ export const updateOne = function (Model) {
         });
     });
 };
+export const createOne = function (Model) {
+    return catchAsync(async (req, res, next) => {
+        const newDoc = await Model.create(req.body);
+        const data = {
+            status: 'success',
+            data: {
+                [`${Model.modelName.toLowerCase()}`]: newDoc,
+            },
+        };
+        res.status(201).json(data);
+    });
+};
+export const allowFields = function (allowList) {
+    return catchAsync(async function (req, res, next) {
+        const bodyCopy = JSON.parse(JSON.stringify(req.body));
+        for (const item in bodyCopy) {
+            if (!allowList.includes(item)) {
+                delete req.body[item];
+            }
+        }
+        next();
+    });
+};
+export const removeFields = function (removeList) {
+    return catchAsync(async function (req, res, next) {
+        const bodyCopy = JSON.parse(JSON.stringify(req.body));
+        for (const item in bodyCopy) {
+            if (removeList.includes(item)) {
+                delete req.body[item];
+            }
+        }
+        next();
+    });
+};

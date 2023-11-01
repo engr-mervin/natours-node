@@ -5,7 +5,7 @@ import { JSEND } from '../utils/types.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
-import { deleteOne, updateOne } from './genericController.js';
+import { createOne, deleteOne, updateOne } from './genericController.js';
 
 export const getAllTours = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -71,19 +71,7 @@ export const aliasTop = async (
   next();
 };
 
-export const createTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const newTour = await Tour.create(req.body);
-    const data: JSEND = {
-      status: 'success',
-      data: {
-        tour: newTour,
-      },
-    };
-    res.status(201).json(data);
-  }
-);
-
+export const createTour = createOne(Tour);
 export const updateTour = updateOne(Tour);
 export const deleteTour = deleteOne(Tour);
 

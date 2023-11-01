@@ -7,6 +7,7 @@ import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
 import { sendEmail } from '../utils/email.js';
 import crypto from 'crypto';
+import { Roles } from '../utils/express.js';
 
 const signToken = function (id: any) {
   return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET!, {
@@ -98,6 +99,7 @@ export const protect = catchAsync(async function (
   next: NextFunction
 ) {
   //check request if it contains a JWT
+
   if (
     !req.headers.authorization ||
     !req.headers.authorization.startsWith('Bearer')
@@ -165,7 +167,6 @@ export const passwordForgotten = catchAsync(async function (
   res: Response,
   next: NextFunction
 ) {
-  console.log(req.body.email);
   //Get user
   const user: any = await User.findOne({ email: req.body.email });
 

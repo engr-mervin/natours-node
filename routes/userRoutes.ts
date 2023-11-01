@@ -18,6 +18,7 @@ import {
   signup,
 } from '../controllers/authController.js';
 import { ROLE_ADMIN } from '../utils/access-constants.js';
+import { removeFields } from '../controllers/genericController.js';
 
 const router = express.Router();
 
@@ -35,7 +36,7 @@ router.route('/').get(getAllUsers).post(createUser);
 router
   .route('/:id')
   .get(getUser)
-  .patch(updateUser)
+  .patch(removeFields(['password']), updateUser)
   .delete(protect, restrict([ROLE_ADMIN]), deleteUser);
 
 export default router;
