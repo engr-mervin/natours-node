@@ -1,8 +1,7 @@
 import Tour from '../models/tourModel.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
-import { CustomError } from '../classes/customError.js';
-import { createOne, deleteOne, updateOne } from './genericController.js';
+import { createOne, deleteOne, getOne, updateOne, } from './genericController.js';
 export const getAllTours = catchAsync(async (req, res, next) => {
     //create a query
     let queryClass = new QueryManager(Tour.find(), req.query)
@@ -24,30 +23,37 @@ export const getAllTours = catchAsync(async (req, res, next) => {
     };
     return res.status(200).json(data);
 });
-export const getTour = catchAsync(async (req, res, next) => {
-    const tour = await Tour.findById(req.params.id).populate({
-        path: 'reviews',
-        options: {
-            origin: 'tour',
-        },
-    });
-    if (tour === null) {
-        throw new CustomError('No tour found with that ID', 404);
-    }
-    const data = {
-        status: 'success',
-        data: {
-            tour,
-        },
-    };
-    return res.status(200).json(data);
-});
+// export const getTour = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const tour = await Tour.findById(req.params.id).populate({
+//       path: 'reviews',
+//       options: {
+//         origin: 'tour',
+//       },
+//     });
+//     if (tour === null) {
+//       throw new CustomError('No tour found with that ID', 404);
+//     }
+//     return res.status(200).json({
+//       status: 'success',
+//       data: {
+//         tour,
+//       },
+//     });
+//   }
+// );
 export const aliasTop = async (req, res, next) => {
     req.query.limit = '5';
     req.query.sort = '-ratingsAverage -ratingsQuantity';
     req.query.fields = 'name price ratingsAverage summary difficulty';
     next();
 };
+export const getTour = getOne(Tour, {
+    path: 'reviews',
+    options: {
+        origin: 'tour',
+    },
+});
 export const createTour = createOne(Tour);
 export const updateTour = updateOne(Tour);
 export const deleteTour = deleteOne(Tour);

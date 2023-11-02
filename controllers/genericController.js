@@ -59,3 +59,18 @@ export const removeFields = function (removeList) {
         next();
     });
 };
+export const getOne = function (Model, populateObj = undefined) {
+    return catchAsync(async function (req, res, next) {
+        const doc = populateObj
+            ? await Model.findById(req.params.id).populate(populateObj)
+            : await Model.findById(req.params.id);
+        if (!doc)
+            throw new CustomError(`${Model.modelName} not found`, 404);
+        res.status(200).json({
+            status: 'success',
+            data: {
+                [`${Model.modelName}`]: doc,
+            },
+        });
+    });
+};

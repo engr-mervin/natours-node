@@ -7,6 +7,7 @@ import {
   deleteUser,
   updateMyInfo,
   deleteMyAccount,
+  setID,
 } from '../controllers/userController.js';
 import {
   login,
@@ -32,6 +33,8 @@ router.patch('/updatePassword', protect, passwordUpdate);
 router.patch('/updateMyInfo', protect, updateMyInfo);
 router.delete('/deleteMyAccount', protect, deleteMyAccount);
 router.route('/').get(getAllUsers).post(createUser);
+
+router.route('/current').get(protect, setID, getUser);
 
 router
   .route('/:id')

@@ -3,7 +3,7 @@ import { protect } from '../controllers/authController.js';
 import {
   createReview,
   deleteReview,
-  getReviewById,
+  getReview,
   restrictToOwner,
   setIDs,
   updateReview,
@@ -26,18 +26,19 @@ router
   .post(
     protect,
     restrict(CAN_POST_REVIEWS),
+    allowFields(['rating', 'review', 'tour']),
     setIDs,
-    allowFields(['rating', 'review', 'tour', 'user']),
     createReview
   );
 
 router
   .route('/:id')
-  .get(protect, getReviewById)
+  .get(protect, getReview)
   .patch(
     protect,
     restrictToOwner,
     allowFields(['rating', 'review']),
+    setIDs,
     updateReview
   )
   .delete(protect, restrict(DELETE_ACCESS), deleteReview);

@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, PopulateOptions } from 'mongoose';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../classes/customError.js';
@@ -78,5 +78,31 @@ export const removeFields = function (removeList: string[]) {
       }
     }
     next();
+  });
+};
+
+export const getOne = function (
+  Model: Model<any>,
+  populateObj:
+    | PopulateOptions
+    | undefined
+    | (string | PopulateOptions)[] = undefined
+) {
+  return catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const doc = populateObj
+      ? await Model.findById(req.params.id).populate(populateObj)
+      : await Model.findById(req.params.id);
+
+    if (!doc) throw new CustomError(`${Model.modelName} not found`, 404);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        [`${Model.modelName}`]: doc,
+      },
+    });
   });
 };

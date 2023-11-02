@@ -5,7 +5,12 @@ import { JSEND } from '../utils/types.js';
 import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
-import { createOne, deleteOne, updateOne } from './genericController.js';
+import {
+  createOne,
+  deleteOne,
+  getOne,
+  updateOne,
+} from './genericController.js';
 
 export const getAllTours = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -35,29 +40,27 @@ export const getAllTours = catchAsync(
   }
 );
 
-export const getTour = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const tour = await Tour.findById(req.params.id).populate({
-      path: 'reviews',
-      options: {
-        origin: 'tour',
-      },
-    });
+// export const getTour = catchAsync(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     const tour = await Tour.findById(req.params.id).populate({
+//       path: 'reviews',
+//       options: {
+//         origin: 'tour',
+//       },
+//     });
 
-    if (tour === null) {
-      throw new CustomError('No tour found with that ID', 404);
-    }
+//     if (tour === null) {
+//       throw new CustomError('No tour found with that ID', 404);
+//     }
 
-    const data: JSEND = {
-      status: 'success',
-      data: {
-        tour,
-      },
-    };
-
-    return res.status(200).json(data);
-  }
-);
+//     return res.status(200).json({
+//       status: 'success',
+//       data: {
+//         tour,
+//       },
+//     });
+//   }
+// );
 
 export const aliasTop = async (
   req: Request,
@@ -70,6 +73,13 @@ export const aliasTop = async (
 
   next();
 };
+
+export const getTour = getOne(Tour, {
+  path: 'reviews',
+  options: {
+    origin: 'tour',
+  },
+});
 
 export const createTour = createOne(Tour);
 export const updateTour = updateOne(Tour);
