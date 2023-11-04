@@ -2,6 +2,7 @@ import { Model, PopulateOptions } from 'mongoose';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { NextFunction, Request, Response } from 'express';
 import { CustomError } from '../classes/customError.js';
+import { QueryManager } from '../classes/queryManager.js';
 
 export const deleteOne = function (Model: Model<any>) {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -105,4 +106,38 @@ export const getOne = function (
       },
     });
   });
+};
+
+export const getAll = function (Model: Model<any>) {
+  return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    //create a query
+    let queryManager = new QueryManager(Model.find(req.filterObj), req.query)
+      .filter()
+      .sort()
+      .select()
+      .limit();
+
+    //exchange query for data
+    const filteredData = await queryManager.query;
+
+    if (filteredData.length === 0) {
+      throw new Error(`No ${Model.modelName}s found`);
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      results: filteredData.length,
+      data: {
+        [`${Model.modelName.toLowerCase()}s`]: filteredData,
+      },
+    });
+  });
+};
+
+export const cleanData = function (deleteFields: string[]) {
+  return catchAsync(async function (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {});
 };

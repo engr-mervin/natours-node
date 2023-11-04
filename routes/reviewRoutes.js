@@ -1,18 +1,19 @@
 import { Router } from 'express';
 import { protect } from '../controllers/authController.js';
-import { createReview, deleteReview, getReview, restrictToOwner, setIDs, updateReview, } from '../controllers/reviewController.js';
+import { createReview, deleteReview, getReview, restrictToOwner, setIDs, setTour, updateReview, } from '../controllers/reviewController.js';
 import { getAllReviews } from '../controllers/reviewController.js';
 import { restrict } from '../controllers/authController.js';
-import { CAN_POST_REVIEWS, DELETE_ACCESS, } from '../utils/access-constants.js';
+import { DELETE_ACCESS, ROLE_USER, } from '../utils/access-constants.js';
 import { allowFields } from '../controllers/genericController.js';
 const router = Router({ mergeParams: true });
+router.use(protect);
 router
     .route('/')
-    .get(protect, getAllReviews)
-    .post(protect, restrict(CAN_POST_REVIEWS), allowFields(['rating', 'review', 'tour']), setIDs, createReview);
+    .get(setTour, getAllReviews)
+    .post(restrict([ROLE_USER]), allowFields(['rating', 'review', 'tour']), setIDs, createReview);
 router
     .route('/:id')
-    .get(protect, getReview)
-    .patch(protect, restrictToOwner, allowFields(['rating', 'review']), setIDs, updateReview)
-    .delete(protect, restrict(DELETE_ACCESS), deleteReview);
+    .get(getReview)
+    .patch(restrictToOwner, allowFields(['rating', 'review']), setIDs, updateReview)
+    .delete(restrict(DELETE_ACCESS), deleteReview);
 export default router;

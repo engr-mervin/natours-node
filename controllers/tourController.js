@@ -1,28 +1,6 @@
 import Tour from '../models/tourModel.js';
-import { QueryManager } from '../classes/queryManager.js';
 import { catchAsync } from '../utils/routerFunctions.js';
-import { createOne, deleteOne, getOne, updateOne, } from './genericController.js';
-export const getAllTours = catchAsync(async (req, res, next) => {
-    //create a query
-    let queryClass = new QueryManager(Tour.find(), req.query)
-        .filter()
-        .sort()
-        .select()
-        .limit();
-    //exchange query for data
-    const filteredTours = await queryClass.query;
-    if (filteredTours.length === 0) {
-        throw new Error('No results found');
-    }
-    const data = {
-        status: 'success',
-        results: filteredTours.length,
-        data: {
-            tour: filteredTours,
-        },
-    };
-    return res.status(200).json(data);
-});
+import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
 // export const getTour = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     const tour = await Tour.findById(req.params.id).populate({
@@ -56,6 +34,7 @@ export const getTour = getOne(Tour, {
 });
 export const createTour = createOne(Tour);
 export const updateTour = updateOne(Tour);
+export const getAllTours = getAll(Tour);
 export const deleteTour = deleteOne(Tour);
 export const getTourStats = catchAsync(async function (req, res, next) {
     const stats = await Tour.aggregate([

@@ -4,18 +4,24 @@ import { login, passwordForgotten, passwordReset, passwordUpdate, protect, restr
 import { ROLE_ADMIN } from '../utils/access-constants.js';
 import { removeFields } from '../controllers/genericController.js';
 const router = express.Router();
+//public routes
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', passwordForgotten);
 router.patch('/resetPassword/:token', passwordReset);
-router.patch('/updatePassword', protect, passwordUpdate);
-router.patch('/updateMyInfo', protect, updateMyInfo);
-router.delete('/deleteMyAccount', protect, deleteMyAccount);
-router.route('/').get(getAllUsers).post(createUser);
-router.route('/current').get(protect, setID, getUser);
+//protected routes
+router.use(protect);
+router.patch('/updatePassword', passwordUpdate);
+router.patch('/updateMyInfo', updateMyInfo);
+router.delete('/deleteMyAccount', deleteMyAccount);
+router.get('/', getAllUsers);
+router.route('/current').get(setID, getUser);
 router
     .route('/:id')
     .get(getUser)
-    .patch(removeFields(['password']), updateUser)
-    .delete(protect, restrict([ROLE_ADMIN]), deleteUser);
+    .patch(removeFields(['password']), updateUser);
+//admin routes
+router.use(restrict([ROLE_ADMIN]));
+router.post('/', createUser);
+router.delete('/', deleteUser);
 export default router;

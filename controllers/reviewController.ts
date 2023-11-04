@@ -5,27 +5,28 @@ import { CustomError } from '../classes/customError.js';
 import {
   createOne,
   deleteOne,
+  getAll,
   getOne,
   updateOne,
 } from './genericController.js';
 
-export const getAllReviews = catchAsync(async function (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const reviews = req.params.id
-    ? await Review.find({ tour: req.params.id })
-    : await Review.find();
+// export const getAllReviews = catchAsync(async function (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) {
+//   const reviews = req.params.id
+//     ? await Review.find({ tour: req.params.id })
+//     : await Review.find();
 
-  res.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews,
-    },
-  });
-});
+//   res.status(200).json({
+//     status: 'success',
+//     results: reviews.length,
+//     data: {
+//       reviews,
+//     },
+//   });
+// });
 
 // export const getReviewById = catchAsync(async function (
 //   req: Request,
@@ -56,6 +57,18 @@ export const setIDs = async function (
   next();
 };
 
+export const setTour = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (req.params.id) {
+    req.filterObj = { tour: req.params.id };
+  }
+
+  next();
+};
+
 export const restrictToOwner = catchAsync(async function (
   req: Request,
   res: Response,
@@ -70,6 +83,7 @@ export const restrictToOwner = catchAsync(async function (
   next();
 });
 
+export const getAllReviews = getAll(Review);
 export const getReview = getOne(Review);
 export const createReview = createOne(Review);
 export const updateReview = updateOne(Review);

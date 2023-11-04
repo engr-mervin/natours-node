@@ -1,5 +1,6 @@
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
+import { QueryManager } from '../classes/queryManager.js';
 export const deleteOne = function (Model) {
     return catchAsync(async (req, res, next) => {
         const instance = await Model.findByIdAndDelete(req.params.id);
@@ -73,4 +74,29 @@ export const getOne = function (Model, populateObj = undefined) {
             },
         });
     });
+};
+export const getAll = function (Model) {
+    return catchAsync(async (req, res, next) => {
+        //create a query
+        let queryManager = new QueryManager(Model.find(req.filterObj), req.query)
+            .filter()
+            .sort()
+            .select()
+            .limit();
+        //exchange query for data
+        const filteredData = await queryManager.query;
+        if (filteredData.length === 0) {
+            throw new Error(`No ${Model.modelName}s found`);
+        }
+        return res.status(200).json({
+            status: 'success',
+            results: filteredData.length,
+            data: {
+                [`${Model.modelName.toLowerCase()}s`]: filteredData,
+            },
+        });
+    });
+};
+export const cleanData = function (deleteFields) {
+    return catchAsync(async function (req, res, next) { });
 };

@@ -10,7 +10,7 @@ const reviewSchema = new Schema({
         maxlength: [200, 'A review can contain at most 200 characters.'],
         minlength: [10, 'A review can contain at least 10 characters.'],
         validate: {
-            validator: validator(/^[A-Za-z0-9\.\,\-\'\" ]+$/),
+            validator: validator(/^[A-Za-z0-9\.\,\-\'\"\!\? ]+$/),
             message: 'The review is limited to alphanumeric characters and a few symbols only.',
         },
     },
@@ -37,6 +37,8 @@ const reviewSchema = new Schema({
 });
 reviewSchema.pre(/^find/, registerOrigin('review'));
 reviewSchema.pre(/^find/, function (next) {
+    if (this.options.origin === 'tour')
+        return next();
     this.populate({
         path: 'user',
         select: 'name photo',

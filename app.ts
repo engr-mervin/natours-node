@@ -65,7 +65,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-
+app.use('*', async function (req: Request, res: Response, next: NextFunction) {
+  req.filterObj = {};
+  req.user = {};
+  next();
+});
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);

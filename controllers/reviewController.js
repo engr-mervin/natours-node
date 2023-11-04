@@ -1,19 +1,23 @@
 import Review from '../models/reviewModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
-import { createOne, deleteOne, getOne, updateOne, } from './genericController.js';
-export const getAllReviews = catchAsync(async function (req, res, next) {
-    const reviews = req.params.id
-        ? await Review.find({ tour: req.params.id })
-        : await Review.find();
-    res.status(200).json({
-        status: 'success',
-        results: reviews.length,
-        data: {
-            reviews,
-        },
-    });
-});
+import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
+// export const getAllReviews = catchAsync(async function (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) {
+//   const reviews = req.params.id
+//     ? await Review.find({ tour: req.params.id })
+//     : await Review.find();
+//   res.status(200).json({
+//     status: 'success',
+//     results: reviews.length,
+//     data: {
+//       reviews,
+//     },
+//   });
+// });
 // export const getReviewById = catchAsync(async function (
 //   req: Request,
 //   res: Response,
@@ -35,6 +39,12 @@ export const setIDs = async function (req, res, next) {
     req.body.user = req.user._id;
     next();
 };
+export const setTour = async function (req, res, next) {
+    if (req.params.id) {
+        req.filterObj = { tour: req.params.id };
+    }
+    next();
+};
 export const restrictToOwner = catchAsync(async function (req, res, next) {
     const currentReview = await Review.findById(req.params.id);
     if (currentReview?.user?._id.toString() !== req.user._id.toString()) {
@@ -42,6 +52,7 @@ export const restrictToOwner = catchAsync(async function (req, res, next) {
     }
     next();
 });
+export const getAllReviews = getAll(Review);
 export const getReview = getOne(Review);
 export const createReview = createOne(Review);
 export const updateReview = updateOne(Review);
