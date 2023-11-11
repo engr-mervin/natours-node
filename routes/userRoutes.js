@@ -17,7 +17,7 @@ router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', getAllUsers);
 router.route('/current').get(setID, getUser);
 router
-    .route('/:id')
+    .route('/:userId')
     .get(getUser)
     .patch(removeFields(['password']), updateUser);
 //admin routes

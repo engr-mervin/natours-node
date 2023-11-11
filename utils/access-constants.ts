@@ -1,4 +1,4 @@
-export const DELETE_ACCESS = ['admin'];
+export const DELETE_ACCESS = ['admin', 'user'];
 
 export const REVIEW_ACCESS = ['user', 'admin'];
 

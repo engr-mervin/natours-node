@@ -11,13 +11,7 @@ import {
 } from '../controllers/reviewController.js';
 import { getAllReviews } from '../controllers/reviewController.js';
 import { restrict } from '../controllers/authController.js';
-import {
-  CAN_POST_REVIEWS,
-  DELETE_ACCESS,
-  REVIEW_ACCESS,
-  ROLE_ADMIN,
-  ROLE_USER,
-} from '../utils/access-constants.js';
+import { DELETE_ACCESS, ROLE_USER } from '../utils/access-constants.js';
 import { allowFields } from '../controllers/genericController.js';
 
 const router = Router({ mergeParams: true });
@@ -34,7 +28,7 @@ router
   );
 
 router
-  .route('/:id')
+  .route('/:reviewId')
   .get(getReview)
   .patch(
     restrictToOwner,
@@ -42,6 +36,6 @@ router
     setIDs,
     updateReview
   )
-  .delete(restrict(DELETE_ACCESS), deleteReview);
+  .delete(restrict(DELETE_ACCESS), restrictToOwner, deleteReview);
 
 export default router;

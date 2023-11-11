@@ -6,11 +6,16 @@ import { QueryManager } from '../classes/queryManager.js';
 
 export const deleteOne = function (Model: Model<any>) {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const instance = await Model.findByIdAndDelete(req.params.id);
+    const modelName = Model.modelName.toLowerCase();
+    const instance = await Model.findByIdAndDelete(
+      req.params[`${modelName}Id`]
+    );
 
     if (instance === null) {
       throw new CustomError(
-        `No ${Model.modelName} found with that ID: ${req.params.id}`,
+        `No ${Model.modelName} found with that ID: ${
+          req.params[`${modelName}Id`]
+        }`,
         404
       );
     }
@@ -23,15 +28,20 @@ export const deleteOne = function (Model: Model<any>) {
 
 export const updateOne = function (Model: Model<any>) {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const updatedDoc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const modelName = Model.modelName.toLowerCase();
+    const updatedDoc = await Model.findByIdAndUpdate(
+      req.params[`${modelName}Id`],
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     return res.status(200).json({
       status: 'success',
       data: {
-        [`${Model.modelName.toLowerCase()}`]: updatedDoc,
+        [`${modelName}`]: updatedDoc,
       },
     });
   });
@@ -94,15 +104,16 @@ export const getOne = function (
     res: Response,
     next: NextFunction
   ) {
+    const modelName = Model.modelName.toLowerCase();
     const doc = populateObj
-      ? await Model.findById(req.params.id).populate(populateObj)
-      : await Model.findById(req.params.id);
+      ? await Model.findById(req.params[`${modelName}Id`]).populate(populateObj)
+      : await Model.findById(req.params[`${modelName}Id`]);
 
-    if (!doc) throw new CustomError(`${Model.modelName} not found`, 404);
+    if (!doc) throw new CustomError(`${modelName} not found`, 404);
     res.status(200).json({
       status: 'success',
       data: {
-        [`${Model.modelName}`]: doc,
+        [`${modelName}`]: doc,
       },
     });
   });

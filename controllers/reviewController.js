@@ -34,19 +34,19 @@ import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericContr
 // });
 export const setIDs = async function (req, res, next) {
     if (!req.body.tour) {
-        req.body.tour = req.params.id;
+        req.body.tour = req.params.tourId;
     }
     req.body.user = req.user._id;
     next();
 };
 export const setTour = async function (req, res, next) {
-    if (req.params.id) {
-        req.filterObj = { tour: req.params.id };
+    if (req.params.tourId) {
+        req.filterObj = { tour: req.params.tourId };
     }
     next();
 };
 export const restrictToOwner = catchAsync(async function (req, res, next) {
-    const currentReview = await Review.findById(req.params.id);
+    const currentReview = await Review.findById(req.params.reviewId);
     if (currentReview?.user?._id.toString() !== req.user._id.toString()) {
         throw new CustomError("You can't edit reviews you didn't make", 403);
     }

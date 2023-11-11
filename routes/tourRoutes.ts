@@ -20,7 +20,7 @@ import reviewRouter from './reviewRoutes.js';
 
 const router = express.Router();
 
-router.use('/:id/reviews', reviewRouter);
+router.use('/:tourId/reviews', reviewRouter);
 
 router.route('/top5').get(aliasTop, getAllTours);
 
@@ -35,7 +35,7 @@ router
 router.route('/stats').get(getTourStats);
 
 router
-  .route('/:id')
+  .route('/:tourId')
   .get(getTour)
   .patch(updateTour)
   .delete(protect, restrict(DELETE_ACCESS), deleteTour);

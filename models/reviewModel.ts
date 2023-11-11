@@ -2,6 +2,7 @@
 import { Schema, model } from 'mongoose';
 import { validator } from '../utils/validators.js';
 import { registerOrigin } from '../utils/query-helpers.js';
+import Tour from './tourModel.js';
 
 const reviewSchema = new Schema(
   {
@@ -55,6 +56,41 @@ reviewSchema.pre(/^find/, function (next) {
   });
 
   next();
+});
+
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  if (stats.length === 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 0,
+    });
+    return;
+  }
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+reviewSchema.post('save', async function () {
+  await this.constructor.calcAverageRatings(this.tour);
+});
+
+reviewSchema.post(/^findOneAnd/, async function (doc) {
+  await doc.constructor.calcAverageRatings(doc.tour);
 });
 
 const Review = model('Review', reviewSchema);

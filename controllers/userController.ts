@@ -98,8 +98,8 @@ export const setID = catchAsync(async function (
   res: Response,
   next: NextFunction
 ) {
-  if (!req.params.id) {
-    req.params.id = req.user._id;
+  if (!req.params.userId) {
+    req.params.userId = req.user._id;
   }
 
   next();

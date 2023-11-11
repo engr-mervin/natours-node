@@ -3,9 +3,10 @@ import { CustomError } from '../classes/customError.js';
 import { QueryManager } from '../classes/queryManager.js';
 export const deleteOne = function (Model) {
     return catchAsync(async (req, res, next) => {
-        const instance = await Model.findByIdAndDelete(req.params.id);
+        const modelName = Model.modelName.toLowerCase();
+        const instance = await Model.findByIdAndDelete(req.params[`${modelName}Id`]);
         if (instance === null) {
-            throw new CustomError(`No ${Model.modelName} found with that ID: ${req.params.id}`, 404);
+            throw new CustomError(`No ${Model.modelName} found with that ID: ${req.params[`${modelName}Id`]}`, 404);
         }
         return res.status(204).json({
             status: 'success',
@@ -14,14 +15,15 @@ export const deleteOne = function (Model) {
 };
 export const updateOne = function (Model) {
     return catchAsync(async (req, res, next) => {
-        const updatedDoc = await Model.findByIdAndUpdate(req.params.id, req.body, {
+        const modelName = Model.modelName.toLowerCase();
+        const updatedDoc = await Model.findByIdAndUpdate(req.params[`${modelName}Id`], req.body, {
             new: true,
             runValidators: true,
         });
         return res.status(200).json({
             status: 'success',
             data: {
-                [`${Model.modelName.toLowerCase()}`]: updatedDoc,
+                [`${modelName}`]: updatedDoc,
             },
         });
     });
@@ -62,15 +64,16 @@ export const removeFields = function (removeList) {
 };
 export const getOne = function (Model, populateObj = undefined) {
     return catchAsync(async function (req, res, next) {
+        const modelName = Model.modelName.toLowerCase();
         const doc = populateObj
-            ? await Model.findById(req.params.id).populate(populateObj)
-            : await Model.findById(req.params.id);
+            ? await Model.findById(req.params[`${modelName}Id`]).populate(populateObj)
+            : await Model.findById(req.params[`${modelName}Id`]);
         if (!doc)
-            throw new CustomError(`${Model.modelName} not found`, 404);
+            throw new CustomError(`${modelName} not found`, 404);
         res.status(200).json({
             status: 'success',
             data: {
-                [`${Model.modelName}`]: doc,
+                [`${modelName}`]: doc,
             },
         });
     });

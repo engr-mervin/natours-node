@@ -61,8 +61,8 @@ export const deleteMyAccount = catchAsync(async function (req, res, next) {
     res.status(204).json();
 });
 export const setID = catchAsync(async function (req, res, next) {
-    if (!req.params.id) {
-        req.params.id = req.user._id;
+    if (!req.params.userId) {
+        req.params.userId = req.user._id;
     }
     next();
 });
