@@ -7,7 +7,6 @@ import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
 import { sendEmail } from '../utils/email.js';
 import crypto from 'crypto';
-import { Roles } from '../utils/express.js';
 
 const signToken = function (id: any) {
   return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET!, {

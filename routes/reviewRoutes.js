@@ -4,7 +4,7 @@ import { createReview, deleteReview, getReview, restrictToOwner, setIDs, setTour
 import { getAllReviews } from '../controllers/reviewController.js';
 import { restrict } from '../controllers/authController.js';
 import { DELETE_ACCESS, ROLE_USER } from '../utils/access-constants.js';
-import { allowFields, } from '../controllers/genericController.js';
+import { allowFields } from '../controllers/genericController.js';
 const router = Router({ mergeParams: true });
 router.use(protect);
 router
