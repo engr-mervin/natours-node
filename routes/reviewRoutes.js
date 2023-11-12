@@ -4,13 +4,15 @@ import { createReview, deleteReview, getReview, restrictToOwner, setIDs, setTour
 import { getAllReviews } from '../controllers/reviewController.js';
 import { restrict } from '../controllers/authController.js';
 import { DELETE_ACCESS, ROLE_USER } from '../utils/access-constants.js';
-import { allowFields } from '../controllers/genericController.js';
+import { allowFields, } from '../controllers/genericController.js';
 const router = Router({ mergeParams: true });
 router.use(protect);
 router
     .route('/')
     .get(setTour, getAllReviews)
-    .post(restrict([ROLE_USER]), allowFields(['rating', 'review', 'tour']), setIDs, createReview);
+    .post(restrict([ROLE_USER]), 
+// limitToOnePerUser(Review),
+allowFields(['rating', 'review', 'tour']), setIDs, createReview);
 router
     .route('/:reviewId')
     .get(getReview)

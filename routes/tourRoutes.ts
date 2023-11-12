@@ -8,6 +8,8 @@ import {
   aliasTop,
   getTourStats,
   getMonthlyPlan,
+  getToursWithin,
+  getDistances,
 } from '../controllers/tourController.js';
 import { protect, restrict } from '../controllers/authController.js';
 import {
@@ -21,6 +23,12 @@ import reviewRouter from './reviewRoutes.js';
 const router = express.Router();
 
 router.use('/:tourId/reviews', reviewRouter);
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(getToursWithin);
+
+router.route('/distances/:latlng/unit/:unit').get(getDistances);
 
 router.route('/top5').get(aliasTop, getAllTours);
 

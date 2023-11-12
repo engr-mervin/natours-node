@@ -42,7 +42,7 @@ export const deleteMyAccount = catchAsync(async function (req, res, next) {
     }
     //ask for log in credentials
     //check password to records
-    const passwordIsValid = user.passwordsMatch(req.body.password);
+    const passwordIsValid = await user.passwordsMatch(req.body.password);
     if (!passwordIsValid) {
         throw new CustomError('Password does not match our records', 400);
     }

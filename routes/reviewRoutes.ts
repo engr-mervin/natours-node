@@ -12,7 +12,11 @@ import {
 import { getAllReviews } from '../controllers/reviewController.js';
 import { restrict } from '../controllers/authController.js';
 import { DELETE_ACCESS, ROLE_USER } from '../utils/access-constants.js';
-import { allowFields } from '../controllers/genericController.js';
+import {
+  allowFields,
+  limitToOnePerUser,
+} from '../controllers/genericController.js';
+import Review from '../models/reviewModel.js';
 
 const router = Router({ mergeParams: true });
 
@@ -22,6 +26,7 @@ router
   .get(setTour, getAllReviews)
   .post(
     restrict([ROLE_USER]),
+    // limitToOnePerUser(Review),
     allowFields(['rating', 'review', 'tour']),
     setIDs,
     createReview

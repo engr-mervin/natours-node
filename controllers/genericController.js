@@ -62,6 +62,17 @@ export const removeFields = function (removeList) {
         next();
     });
 };
+export const limitToOnePerUser = function (Model, identifier = 'user') {
+    return catchAsync(async function (req, res, next) {
+        if (!req.user._id)
+            throw new CustomError('No user found.', 400);
+        const instance = await Model.findOne({ [identifier]: req.user._id });
+        if (instance) {
+            throw new CustomError(`Only one instance of ${Model.modelName} per ${identifier} is allowed.`, 400);
+        }
+        next();
+    });
+};
 export const getOne = function (Model, populateObj = undefined) {
     return catchAsync(async function (req, res, next) {
         const modelName = Model.modelName.toLowerCase();
@@ -88,9 +99,9 @@ export const getAll = function (Model) {
             .limit();
         //exchange query for data
         const filteredData = await queryManager.query;
-        if (filteredData.length === 0) {
-            throw new Error(`No ${Model.modelName}s found`);
-        }
+        // if (filteredData.length === 0) {
+        //   throw new CustomError(`No ${Model.modelName}s found`, 404);
+        // }
         return res.status(200).json({
             status: 'success',
             results: filteredData.length,

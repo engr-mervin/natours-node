@@ -35,19 +35,19 @@ router.use(protect);
 router.patch('/updatePassword', passwordUpdate);
 router.patch('/updateMyInfo', updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
-router.get('/', getAllUsers);
+router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
 
 router.route('/current').get(setID, getUser);
-
-router
-  .route('/:userId')
-  .get(getUser)
-  .patch(removeFields(['password']), updateUser);
 
 //admin routes
 router.use(restrict([ROLE_ADMIN]));
 
+router
+  .route('/:userId')
+  .get(getUser)
+  .patch(removeFields(['password']), updateUser)
+  .delete(deleteUser);
+
 router.post('/', createUser);
-router.delete('/', deleteUser);
 
 export default router;
