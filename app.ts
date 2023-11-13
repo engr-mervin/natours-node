@@ -3,7 +3,7 @@ import express from 'express';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import reviewRouter from './routes/reviewRoutes.js';
-import { STATIC_FOLDER, __rootdirname } from './paths.js';
+import { STATIC_FOLDER, VIEW_FOLDER, __rootdirname } from './paths.js';
 import { CustomError } from './classes/customError.js';
 import { errorHandler } from './handlers/errorHandler.js';
 import rateLimit from 'express-rate-limit';
@@ -12,6 +12,7 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
+import { catchAsync } from './utils/routerFunctions.js';
 
 const app = express();
 
@@ -53,6 +54,8 @@ app.use(
   })
 );
 
+app.set('view engine', 'pug');
+app.set('views', VIEW_FOLDER);
 //Static folder
 app.use(express.static(STATIC_FOLDER));
 
@@ -70,6 +73,36 @@ app.use('*', async function (req: Request, res: Response, next: NextFunction) {
   req.user = {};
   next();
 });
+
+//PAGES
+app.get(
+  '/',
+  catchAsync(async function (req: Request, res: Response) {
+    res.status(200).render('base', {
+      tour: 'The Forest Hiker',
+      user: 'Jonas',
+    });
+  })
+);
+
+app.get(
+  '/overview',
+  catchAsync(async function (req: Request, res: Response) {
+    res.status(200).render('overview', {
+      title: 'All Tours',
+    });
+  })
+);
+
+app.get(
+  '/tour',
+  catchAsync(async function (req: Request, res: Response) {
+    res.status(200).render('tour', {
+      title: 'The Forest Hiker Tour',
+    });
+  })
+);
+
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
