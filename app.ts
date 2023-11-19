@@ -3,6 +3,7 @@ import express from 'express';
 import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import reviewRouter from './routes/reviewRoutes.js';
+import viewRouter from './routes/viewRoutes.js';
 import { STATIC_FOLDER, VIEW_FOLDER, __rootdirname } from './paths.js';
 import { CustomError } from './classes/customError.js';
 import { errorHandler } from './handlers/errorHandler.js';
@@ -75,33 +76,7 @@ app.use('*', async function (req: Request, res: Response, next: NextFunction) {
 });
 
 //PAGES
-app.get(
-  '/',
-  catchAsync(async function (req: Request, res: Response) {
-    res.status(200).render('base', {
-      tour: 'The Forest Hiker',
-      user: 'Jonas',
-    });
-  })
-);
-
-app.get(
-  '/overview',
-  catchAsync(async function (req: Request, res: Response) {
-    res.status(200).render('overview', {
-      title: 'All Tours',
-    });
-  })
-);
-
-app.get(
-  '/tour',
-  catchAsync(async function (req: Request, res: Response) {
-    res.status(200).render('tour', {
-      title: 'The Forest Hiker Tour',
-    });
-  })
-);
+app.use('/', viewRouter);
 
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
