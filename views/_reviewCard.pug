@@ -1,0 +1,15 @@
+mixin reviewCard(review)
+   .reviews__card 
+      .reviews__avatar 
+         img.reviews__avatar-img(src=`/img/users/${review.user.photo}`,alt=`${review.user.name}`)
+         h6.reviews__user=review.user.name 
+      p.reviews__text=review.review 
+      .reviews__rating
+         -const activeStars = Math.floor(tour.ratingsAverage);
+         -const inactiveStars = 5 - activeStars;
+         each star in Array(activeStars).fill()
+            svg.reviews__star.reviews__star--active 
+               use(xlink:href="/img/icons.svg#icon-star")
+         each star in Array(inactiveStars).fill()
+            svg.reviews__star.reviews__star--inactive
+               use(xlink:href="/img/icons.svg#icon-star")
