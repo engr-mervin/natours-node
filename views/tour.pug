@@ -1,6 +1,7 @@
 extends base
 include _reviewCard
 
+
 mixin overviewBox(label,text,icon)
    .overview-box__detail 
       svg.overview-box__icon 
@@ -9,6 +10,12 @@ mixin overviewBox(label,text,icon)
       | 
       span.overview-box__text=text
 
+
+
+block append head
+   script(src='/js/leaflet.js',defer,type="module")
+   link(rel='stylesheet',href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",crossorigin="")
+   script(src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",crossorigin="")
 
 block content 
    section.section-header  
@@ -52,18 +59,12 @@ block content
          -const paragraphs = tour.description.split('\n');
          each p in paragraphs
             p.description__text=p
-      .description-box 
-         h2.heading-secondary.ma-bt-lg 
-         p.description__text
-            | Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-            | dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-            | proident, sunt in culpa qui officia deserunt mollit anim id est
-            | laborum!
    section.section-pictures 
       each image,index in tour.images
          .picture-box
             img.picture-box__img(class=`picture-box__img--${index}`,src=`/img/tours/${image}`,alt=`${tour.name} ${index+1}`)
    section.section-map 
+      #map(data-locations=`${JSON.stringify(tour.locations)}`)
    section.section-reviews 
       .reviews    
          each review in tour.reviews

@@ -30,17 +30,17 @@ export const renderTours = catchAsync(async function (
   const tour = await Tour.findOne({ slug: req.params.tourSlug }).populate({
     path: 'reviews',
     select: 'review rating user',
-    options: {
-      origin: 'tour',
-    },
   });
 
-  const tours = await Tour.find();
-
-  console.log(tour);
   res.status(200).render('tour', {
-    title: 'The Forest Hiker Tour',
+    title: `${tour?.name || ''} Tour`,
     tour,
-    tours,
   });
+});
+
+export const renderLogin = catchAsync(async function (
+  req: Request,
+  res: Response
+) {
+  res.status(200).render('login', { title: 'Login' });
 });
