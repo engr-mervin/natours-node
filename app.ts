@@ -13,7 +13,8 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
-import { catchAsync } from './utils/routerFunctions.js';
+
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
@@ -48,6 +49,8 @@ app.use(
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+app.use(cookieParser());
 
 //Limit API requests
 const limiter = rateLimit({
@@ -89,6 +92,7 @@ app.use(express.static(STATIC_FOLDER));
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
   next();
 });
 app.use('*', async function (req: Request, res: Response, next: NextFunction) {
@@ -97,13 +101,14 @@ app.use('*', async function (req: Request, res: Response, next: NextFunction) {
   next();
 });
 
-//PAGES
-app.use('/', viewRouter);
-
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+
+//PAGES
+app.use('/', viewRouter);
+
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
   const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
   next(err);

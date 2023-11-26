@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from '../utils/routerFunctions.js';
 import Tour from '../models/tourModel.js';
 // export const renderHome = catchAsync(async function (
@@ -42,5 +42,8 @@ export const renderLogin = catchAsync(async function (
   req: Request,
   res: Response
 ) {
-  res.status(200).render('login', { title: 'Login' });
+  if (!res.locals.user) {
+    return res.status(200).render('login', { title: 'Login' });
+  }
+  return res.redirect('/');
 });

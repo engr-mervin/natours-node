@@ -27,5 +27,8 @@ export const renderTours = catchAsync(async function (req, res) {
     });
 });
 export const renderLogin = catchAsync(async function (req, res) {
-    res.status(200).render('login', { title: 'Login' });
+    if (!res.locals.user) {
+        return res.status(200).render('login', { title: 'Login' });
+    }
+    return res.redirect('/');
 });

@@ -144,6 +144,99 @@ export const protect = catchAsync(async function (
   next();
 });
 
+export const protectPage = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    //check request if it contains a JWT
+    if (!req?.cookies?.jwt) {
+      throw new CustomError('Please provide a valid auth token', 401);
+    }
+
+    const token = req.cookies.jwt as string;
+
+    //verify the JWT
+    const payload: any = jwt.verify(
+      token,
+      process.env.JSONWEBTOKEN_SECRET!,
+      (error, payload) => {
+        if (error) throw error;
+
+        return payload;
+      }
+    );
+
+    //if verified get the user
+
+    const candidateUser: any = await User.findById(payload.id);
+    if (candidateUser === undefined || candidateUser === null) {
+      throw new CustomError('User does not exist.', 401);
+    }
+    const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
+
+    if (isModified) {
+      throw new CustomError(
+        'Token is no longer valid. Please log in again.',
+        401
+      );
+    }
+
+    res.locals.user = candidateUser;
+
+    next();
+  } catch (error: any) {
+    res.status(401).render('error', {
+      message: error.message,
+      title: 'Error',
+    });
+  }
+};
+
+export const isLoggedIn = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    //check request if it contains a JWT
+    if (!req?.cookies?.jwt) {
+      return next();
+    }
+
+    const token = req.cookies.jwt as string;
+
+    //verify the JWT
+    const payload: any = jwt.verify(
+      token,
+      process.env.JSONWEBTOKEN_SECRET!,
+      (error, payload) => {
+        if (error) throw error;
+
+        return payload;
+      }
+    );
+
+    //if verified get the user
+
+    const candidateUser: any = await User.findById(payload.id);
+    if (candidateUser === undefined || candidateUser === null) {
+      return next();
+    }
+    const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
+
+    if (isModified) {
+      return next();
+    }
+
+    res.locals.user = candidateUser;
+    next();
+  } catch (error: any) {
+    next();
+  }
+};
+
 export const restrict = function (authorizedRoles: string[]) {
   return catchAsync(async function (
     req: Request,
