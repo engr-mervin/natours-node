@@ -21,7 +21,11 @@ const styleSrcUrls = [
     'https://fonts.googleapis.com/',
     'https://tiles.stadiamaps.com',
 ];
-const connectSrcUrls = ['https://unpkg.com', 'https://tile.openstreetmap.org'];
+const connectSrcUrls = [
+    'https://unpkg.com',
+    'https://tile.openstreetmap.org',
+    'ws://localhost:1234',
+];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 //MIDDLEWARES
 //Security Headers

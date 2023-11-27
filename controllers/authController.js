@@ -120,6 +120,10 @@ export const protectPage = async function (req, res, next) {
         });
     }
 };
+export const logout = catchAsync(async function (req, res, next) {
+    res.clearCookie('jwt');
+    res.redirect('/');
+});
 export const isLoggedIn = async function (req, res, next) {
     try {
         //check request if it contains a JWT

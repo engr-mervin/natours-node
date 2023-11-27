@@ -11,6 +11,7 @@ import {
 } from '../controllers/userController.js';
 import {
   login,
+  logout,
   passwordForgotten,
   passwordReset,
   passwordUpdate,

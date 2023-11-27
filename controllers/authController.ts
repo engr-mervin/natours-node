@@ -194,6 +194,16 @@ export const protectPage = async function (
   }
 };
 
+export const logout = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  res.clearCookie('jwt');
+
+  res.redirect('/');
+});
+
 export const isLoggedIn = async function (
   req: Request,
   res: Response,

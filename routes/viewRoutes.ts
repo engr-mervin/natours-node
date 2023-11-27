@@ -4,11 +4,16 @@ import {
   renderTours,
   renderLogin,
 } from '../controllers/viewController.js';
-import { isLoggedIn, protectPage } from '../controllers/authController.js';
+import {
+  isLoggedIn,
+  logout,
+  protectPage,
+} from '../controllers/authController.js';
 
 const router = Router();
 router.use(isLoggedIn);
 router.get('/login', renderLogin);
+router.get('/logout', logout);
 router.get('/', renderOverview);
 
 router.use(protectPage);

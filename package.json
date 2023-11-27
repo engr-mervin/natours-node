@@ -8,7 +8,10 @@
   },
   "name": "lakbay",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "targets": {
+    "main": false
+  },
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,7 +19,9 @@
     "start-node": "nodemon server.js",
     "start:dev": "SET NODE_ENV=development&&npm-run-all --parallel ts-compile start-node",
     "start:prod": "SET NODE_ENV=production&&npm-run-all --parallel ts-compile start-node",
-    "debug": "node --inspect-brk server.js"
+    "debug": "node --inspect-brk server.js",
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled",
+    "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundled"
   },
   "keywords": [],
   "author": "John Mervin C. Bocatcat <mervin@eonox.dev> (https://www.eonox.dev/)",
@@ -43,6 +48,7 @@
     "mongoose": "^7.5.2",
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.6",
+    "parcel": "^2.10.3",
     "pug": "^3.0.2",
     "slugify": "^1.6.6",
     "xss-clean": "^0.1.4"

@@ -1,15 +1,10 @@
-const form = document.querySelector('.form');
-const email = document.getElementById('email') as HTMLInputElement;
-const password = document.getElementById('password') as HTMLInputElement;
-
-form?.addEventListener('submit', async function (event) {
+import { hideAlert, showAlert } from './alerts.js';
+export const login = async function (email: string, password: string) {
   try {
-    event.preventDefault();
     const body = JSON.stringify({
-      email: email?.value || '',
-      password: password?.value || '',
+      email: email || '',
+      password: password || '',
     });
-    console.log(body);
     const loginRequest = await fetch(
       'http://localhost:3000/api/v1/users/login',
       {
@@ -23,8 +18,14 @@ form?.addEventListener('submit', async function (event) {
     if (loginResult.error) {
       throw loginResult;
     }
+
+    showAlert('success', 'Logged in successfully');
+
+    setTimeout(() => {
+      window.location.href = 'http://localhost:3000/';
+    }, 1500);
     //   document.cookie = `token=${loginResult.token}; path=/;`;
   } catch (error: any) {
-    alert(error!.message!);
+    showAlert('error', error!.message!);
   }
-});
+};
