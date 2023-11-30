@@ -1,5 +1,5 @@
 import User from '../models/userModel.js';
-import { catchAsync } from '../utils/routerFunctions.js';
+import { catchAsync, catchAsyncPage } from '../utils/routerFunctions.js';
 import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
@@ -88,38 +88,30 @@ export const protect = catchAsync(async function (req, res, next) {
     req.user = candidateUser;
     next();
 });
-export const protectPage = async function (req, res, next) {
-    try {
-        //check request if it contains a JWT
-        if (!req?.cookies?.jwt) {
-            throw new CustomError('Please provide a valid auth token', 401);
-        }
-        const token = req.cookies.jwt;
-        //verify the JWT
-        const payload = jwt.verify(token, process.env.JSONWEBTOKEN_SECRET, (error, payload) => {
-            if (error)
-                throw error;
-            return payload;
-        });
-        //if verified get the user
-        const candidateUser = await User.findById(payload.id);
-        if (candidateUser === undefined || candidateUser === null) {
-            throw new CustomError('User does not exist.', 401);
-        }
-        const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
-        if (isModified) {
-            throw new CustomError('Token is no longer valid. Please log in again.', 401);
-        }
-        res.locals.user = candidateUser;
-        next();
+export const protectPage = catchAsyncPage(async function (req, res, next) {
+    //check request if it contains a JWT
+    if (!req?.cookies?.jwt) {
+        throw new CustomError('Please provide a valid auth token', 401);
     }
-    catch (error) {
-        res.status(401).render('error', {
-            message: error.message,
-            title: 'Error',
-        });
+    const token = req.cookies.jwt;
+    //verify the JWT
+    const payload = jwt.verify(token, process.env.JSONWEBTOKEN_SECRET, (error, payload) => {
+        if (error)
+            throw error;
+        return payload;
+    });
+    //if verified get the user
+    const candidateUser = await User.findById(payload.id);
+    if (candidateUser === undefined || candidateUser === null) {
+        throw new CustomError('User does not exist.', 401);
     }
-};
+    const isModified = await candidateUser.passwordModifiedAfter(payload.iat);
+    if (isModified) {
+        throw new CustomError('Token is no longer valid. Please log in again.', 401);
+    }
+    res.locals.user = candidateUser;
+    next();
+});
 export const logout = catchAsync(async function (req, res, next) {
     res.clearCookie('jwt');
     res.redirect('/');

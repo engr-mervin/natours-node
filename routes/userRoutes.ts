@@ -37,7 +37,7 @@ router.patch('/updatePassword', passwordUpdate);
 router.patch('/updateMyInfo', updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
-
+router.get('/logout', logout);
 router.route('/current').get(setID, getUser);
 
 //admin routes

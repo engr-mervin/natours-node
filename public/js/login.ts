@@ -1,4 +1,4 @@
-import { hideAlert, showAlert } from './alerts.js';
+import { showAlert } from './alerts.js';
 export const login = async function (email: string, password: string) {
   try {
     const body = JSON.stringify({

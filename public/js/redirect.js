@@ -5,4 +5,3 @@ const redirect = function () {
     }, 3000);
 };
 redirect();
-alert('hi');

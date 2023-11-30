@@ -576,7 +576,10 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"4uyBp":[function(require,module,exports) {
 var _loginJs = require("./login.js");
 var _leafletJs = require("./leaflet.js");
-var _document_getElementById, _document;
+var _errorJs = require("./error.js");
+var _errorTitle_dataset, _document_getElementById, _document;
+const errorTitle = document.querySelector(".error__title");
+const statusCode = Number(errorTitle === null || errorTitle === void 0 ? void 0 : (_errorTitle_dataset = errorTitle.dataset) === null || _errorTitle_dataset === void 0 ? void 0 : _errorTitle_dataset.status);
 const form = document.querySelector(".form");
 const email = document.getElementById("email");
 const password = document.getElementById("password");
@@ -587,8 +590,9 @@ if (form) form === null || form === void 0 ? void 0 : form.addEventListener("sub
     (0, _loginJs.login)(email.value, password.value);
 });
 if (locations) (0, _leafletJs.displayMap)(locations);
+if (statusCode) (0, _errorJs.error)(statusCode);
 
-},{"./login.js":"qZEOz","./leaflet.js":"58ZVV"}],"qZEOz":[function(require,module,exports) {
+},{"./login.js":"qZEOz","./leaflet.js":"58ZVV","./error.js":"kEVtf"}],"qZEOz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
@@ -618,7 +622,29 @@ const login = async function(email, password) {
     }
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt","./alerts.js":"j4hQk"}],"5Birt":[function(require,module,exports) {
+},{"./alerts.js":"j4hQk","@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"j4hQk":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "hideAlert", ()=>hideAlert);
+parcelHelpers.export(exports, "showAlert", ()=>showAlert);
+let scheduledHide;
+const hideAlert = function() {
+    var _alertElement_parentElement;
+    const alertElement = document.querySelector(".alert");
+    if (alertElement) (_alertElement_parentElement = alertElement.parentElement) === null || _alertElement_parentElement === void 0 ? void 0 : _alertElement_parentElement.removeChild(alertElement);
+};
+const showAlert = function(type, message) {
+    var _document_querySelector;
+    if (scheduledHide) clearTimeout(scheduledHide);
+    hideAlert();
+    const markup = `<div class="alert alert--${type}">${message}</div>`;
+    (_document_querySelector = document.querySelector("body")) === null || _document_querySelector === void 0 ? void 0 : _document_querySelector.insertAdjacentHTML("afterbegin", markup);
+    scheduledHide = setTimeout(()=>{
+        hideAlert();
+    }, 1500);
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"5Birt":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -648,29 +674,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"j4hQk":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "hideAlert", ()=>hideAlert);
-parcelHelpers.export(exports, "showAlert", ()=>showAlert);
-let scheduledHide;
-const hideAlert = function() {
-    var _alertElement_parentElement;
-    const alertElement = document.querySelector(".alert");
-    if (alertElement) (_alertElement_parentElement = alertElement.parentElement) === null || _alertElement_parentElement === void 0 ? void 0 : _alertElement_parentElement.removeChild(alertElement);
-};
-const showAlert = function(type, message) {
-    var _document_querySelector;
-    if (scheduledHide) clearTimeout(scheduledHide);
-    hideAlert();
-    const markup = `<div class="alert alert--${type}">${message}</div>`;
-    (_document_querySelector = document.querySelector("body")) === null || _document_querySelector === void 0 ? void 0 : _document_querySelector.insertAdjacentHTML("afterbegin", markup);
-    scheduledHide = setTimeout(()=>{
-        hideAlert();
-    }, 1500);
-};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"58ZVV":[function(require,module,exports) {
+},{}],"58ZVV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "displayMap", ()=>displayMap);
@@ -719,6 +723,21 @@ const displayMap = function(locations) {
     map.scrollWheelZoom.disable();
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}]},["dcOb1","4uyBp"], "4uyBp", "parcelRequirebe6c")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"kEVtf":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "error", ()=>error);
+var _alerts = require("./alerts");
+const error = function(statusCode) {
+    if (statusCode === 401) {
+        console.log("Unauthorized.");
+        (0, _alerts.showAlert)("error", "Redirecting to login page...");
+        setTimeout(()=>{
+            window.location.href = "/login";
+        }, 3000);
+    }
+};
+
+},{"./alerts":"j4hQk","@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}]},["dcOb1","4uyBp"], "4uyBp", "parcelRequirebe6c")
 
 //# sourceMappingURL=index.js.map

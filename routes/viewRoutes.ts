@@ -3,6 +3,7 @@ import {
   renderOverview,
   renderTours,
   renderLogin,
+  renderFallback,
 } from '../controllers/viewController.js';
 import {
   isLoggedIn,
@@ -20,4 +21,5 @@ router.use(protectPage);
 
 router.get('/tour/:tourSlug', renderTours);
 
+router.all('*', renderFallback);
 export default router;

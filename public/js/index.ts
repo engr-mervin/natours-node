@@ -1,6 +1,9 @@
 import { login } from './login.js';
 import { displayMap } from './leaflet.js';
+import { error } from './error.js';
 
+const errorTitle = document.querySelector('.error__title') as HTMLElement;
+const statusCode = Number(errorTitle?.dataset?.status);
 const form = document.querySelector('.form');
 const email = document.getElementById('email') as HTMLInputElement;
 const password = document.getElementById('password') as HTMLInputElement;
@@ -18,3 +21,5 @@ if (form) {
 }
 
 if (locations) displayMap(locations);
+
+if (statusCode) error(statusCode);

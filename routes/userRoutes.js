@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllUsers, createUser, getUser, updateUser, deleteUser, updateMyInfo, deleteMyAccount, setID, } from '../controllers/userController.js';
-import { login, passwordForgotten, passwordReset, passwordUpdate, protect, restrict, signup, } from '../controllers/authController.js';
+import { login, logout, passwordForgotten, passwordReset, passwordUpdate, protect, restrict, signup, } from '../controllers/authController.js';
 import { ROLE_ADMIN } from '../utils/access-constants.js';
 import { removeFields } from '../controllers/genericController.js';
 const router = express.Router();
@@ -15,6 +15,7 @@ router.patch('/updatePassword', passwordUpdate);
 router.patch('/updateMyInfo', updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
+router.get('/logout', logout);
 router.route('/current').get(setID, getUser);
 //admin routes
 router.use(restrict([ROLE_ADMIN]));

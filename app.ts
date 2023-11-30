@@ -110,13 +110,13 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 
-//PAGES
-app.use('/', viewRouter);
-
-app.all('*', (req: Request, res: Response, next: NextFunction) => {
+app.all('/api/*', (req: Request, res: Response, next: NextFunction) => {
   const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
   next(err);
 });
+
+//PAGES
+app.use('/', viewRouter);
 
 app.use(errorHandler);
 
