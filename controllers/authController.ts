@@ -99,14 +99,17 @@ export const protect = catchAsync(async function (
 ) {
   //check request if it contains a JWT
 
+  let token: any;
   if (
-    !req.headers.authorization ||
-    !req.headers.authorization.startsWith('Bearer')
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
   ) {
-    throw new CustomError('Please provide a valid auth token', 401);
+    token = req.headers.authorization.split(' ')[1];
   }
 
-  const token = req.headers.authorization.split(' ')[1];
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  }
 
   if (!token) {
     throw new CustomError('Invalid user credentials.', 401);
@@ -117,7 +120,7 @@ export const protect = catchAsync(async function (
   const payload: any = jwt.verify(
     token,
     process.env.JSONWEBTOKEN_SECRET!,
-    (error, payload) => {
+    (error: any, payload: any) => {
       if (error) throw error;
 
       return payload;

@@ -16,3 +16,12 @@ export const showAlert = function (type, message) {
         hideAlert();
     }, 1500);
 };
+export const errorCatcher = async function (func, ...argsInput) {
+    try {
+        showAlert('success', 'Please wait...');
+        return await func(...argsInput);
+    }
+    catch (error) {
+        showAlert('error', error.message);
+    }
+};

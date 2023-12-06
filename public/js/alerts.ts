@@ -21,3 +21,15 @@ export const showAlert = function (type: string, message: string) {
     hideAlert();
   }, 1500);
 };
+
+export const errorCatcher = async function (
+  func: Function,
+  ...argsInput: any[]
+) {
+  try {
+    showAlert('success', 'Please wait...');
+    return await func(...argsInput);
+  } catch (error: any) {
+    showAlert('error', error!.message!);
+  }
+};

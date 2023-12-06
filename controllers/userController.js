@@ -20,6 +20,7 @@ import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericContr
 //   }
 // );
 export const updateMyInfo = catchAsync(async function (req, res, next) {
+    console.log(req.body, 'BODY******');
     if (req.body.password || req.body.passwordConfirm) {
         throw new CustomError("You can't change password here", 400);
     }

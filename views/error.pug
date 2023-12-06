@@ -2,8 +2,8 @@ extends base
 
 block content
    main.main
-   .error
-      .error__title(data-status=error.statusCode)
-         h2.heading-secondary.heading-secondary--error Uh oh! Something went wrong!   
-         h2.error__emoji ☹️
-      .error__msg=error.message
+      .error
+         .error__title(data-status=error.statusCode)
+            h2.heading-secondary.heading-secondary--error Uh oh! Something went wrong!   
+            h2.error__emoji 🚫
+         .error__msg=error.message

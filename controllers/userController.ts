@@ -35,6 +35,7 @@ export const updateMyInfo = catchAsync(async function (
   res: Response,
   next: NextFunction
 ) {
+  console.log(req.body, 'BODY******');
   if (req.body.password || req.body.passwordConfirm) {
     throw new CustomError("You can't change password here", 400);
   }

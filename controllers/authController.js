@@ -62,11 +62,14 @@ export const login = catchAsync(async function (req, res, next) {
 });
 export const protect = catchAsync(async function (req, res, next) {
     //check request if it contains a JWT
-    if (!req.headers.authorization ||
-        !req.headers.authorization.startsWith('Bearer')) {
-        throw new CustomError('Please provide a valid auth token', 401);
+    let token;
+    if (req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
     }
-    const token = req.headers.authorization.split(' ')[1];
+    if (req.cookies.jwt) {
+        token = req.cookies.jwt;
+    }
     if (!token) {
         throw new CustomError('Invalid user credentials.', 401);
     }

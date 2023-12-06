@@ -4,6 +4,7 @@ import {
   renderTours,
   renderLogin,
   renderFallback,
+  renderAccount,
 } from '../controllers/viewController.js';
 import {
   isLoggedIn,
@@ -20,6 +21,6 @@ router.get('/', renderOverview);
 router.use(protectPage);
 
 router.get('/tour/:tourSlug', renderTours);
-
+router.get('/me', renderAccount);
 router.all('*', renderFallback);
 export default router;

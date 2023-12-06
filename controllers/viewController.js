@@ -50,3 +50,13 @@ export const renderLogin = catchAsyncPage(async function (req, res) {
 export const renderFallback = catchAsyncPage(async function (req, res, next) {
     throw new CustomError('Page not found', 404);
 });
+export const renderAccount = catchAsyncPage(async function (req, res, next) {
+    const user = res.locals.user;
+    res
+        .status(200)
+        .render('account', { user, title: user.name }, (error, html) => {
+        if (error)
+            throw new CustomError('Something went wrong', 500);
+        res.send(html);
+    });
+});

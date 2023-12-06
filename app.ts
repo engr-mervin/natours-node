@@ -67,6 +67,12 @@ app.use('/api', limiter);
 
 //Body parser
 app.use(express.json({ limit: '10kb' }));
+app.use(
+  express.urlencoded({
+    limit: '10kb',
+    extended: true,
+  })
+);
 
 //sanitizers
 app.use(mongoSanitize());

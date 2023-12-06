@@ -577,49 +577,79 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 var _loginJs = require("./login.js");
 var _leafletJs = require("./leaflet.js");
 var _errorJs = require("./error.js");
+var _alertsJs = require("./alerts.js");
+var _updateInfoJs = require("./updateInfo.js");
 var _errorTitle_dataset, _document_getElementById, _document;
 const errorTitle = document.querySelector(".error__title");
 const statusCode = Number(errorTitle === null || errorTitle === void 0 ? void 0 : (_errorTitle_dataset = errorTitle.dataset) === null || _errorTitle_dataset === void 0 ? void 0 : _errorTitle_dataset.status);
-const form = document.querySelector(".form");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
+const loginForm = document.querySelector(".form--login");
 const locationsString = ((_document = document) === null || _document === void 0 ? void 0 : (_document_getElementById = _document.getElementById("map")) === null || _document_getElementById === void 0 ? void 0 : _document_getElementById.dataset.locations) || "";
 const locations = locationsString ? JSON.parse(locationsString) : null;
-if (form) form === null || form === void 0 ? void 0 : form.addEventListener("submit", (event)=>{
-    event.preventDefault();
-    (0, _loginJs.login)(email.value, password.value);
-});
+if (loginForm) {
+    const password = document.getElementById("password");
+    const email = document.getElementById("email");
+    loginForm === null || loginForm === void 0 ? void 0 : loginForm.addEventListener("submit", (event)=>{
+        event.preventDefault();
+        console.log("login");
+        (0, _alertsJs.errorCatcher)((0, _loginJs.login), email.value, password.value);
+    });
+}
 if (locations) (0, _leafletJs.displayMap)(locations);
 if (statusCode) (0, _errorJs.error)(statusCode);
+const updateUserDataForm = document.querySelector(".form-user-data");
+if (updateUserDataForm) {
+    const email = document.getElementById("email");
+    const name = document.getElementById("name");
+    updateUserDataForm.addEventListener("submit", (event)=>{
+        event.preventDefault();
+        (0, _alertsJs.errorCatcher)((0, _updateInfoJs.updateData), {
+            name: (name === null || name === void 0 ? void 0 : name.value) || "",
+            email: (email === null || email === void 0 ? void 0 : email.value) || ""
+        });
+    });
+}
+const updatePasswordForm = document.querySelector(".form-user-settings");
+if (updatePasswordForm) {
+    const currentPassword = document.getElementById("password-current");
+    const password = document.getElementById("password");
+    const passwordConfirm = document.getElementById("password-confirm");
+    updatePasswordForm.addEventListener("submit", async (event)=>{
+        event.preventDefault();
+        await (0, _alertsJs.errorCatcher)((0, _updateInfoJs.updatePassword), {
+            currentPassword: (currentPassword === null || currentPassword === void 0 ? void 0 : currentPassword.value) || "",
+            password: (password === null || password === void 0 ? void 0 : password.value) || "",
+            passwordConfirm: (passwordConfirm === null || passwordConfirm === void 0 ? void 0 : passwordConfirm.value) || ""
+        });
+        currentPassword.value = "";
+        password.value = "";
+        passwordConfirm.value = "";
+    });
+}
 
-},{"./login.js":"qZEOz","./leaflet.js":"58ZVV","./error.js":"kEVtf"}],"qZEOz":[function(require,module,exports) {
+},{"./login.js":"qZEOz","./leaflet.js":"58ZVV","./error.js":"kEVtf","./alerts.js":"j4hQk","./updateInfo.js":"cfrxY"}],"qZEOz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
 var _alertsJs = require("./alerts.js");
 const login = async function(email, password) {
-    try {
-        const body = JSON.stringify({
-            email: email || "",
-            password: password || ""
-        });
-        const loginRequest = await fetch("http://localhost:3000/api/v1/users/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body
-        });
-        const loginResult = await loginRequest.json();
-        if (loginResult.error) throw loginResult;
-        (0, _alertsJs.showAlert)("success", "Logged in successfully");
-        setTimeout(()=>{
-            window.location.href = "http://localhost:3000/";
-        }, 1500);
-    //   document.cookie = `token=${loginResult.token}; path=/;`;
-    } catch (error) {
-        (0, _alertsJs.showAlert)("error", error.message);
-    }
+    const body = JSON.stringify({
+        email: email || "",
+        password: password || ""
+    });
+    const loginRequest = await fetch("http://localhost:3000/api/v1/users/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body
+    });
+    const loginResult = await loginRequest.json();
+    if (loginResult.error) throw loginResult;
+    (0, _alertsJs.showAlert)("success", "Logged in successfully");
+    setTimeout(()=>{
+        window.location.href = "http://localhost:3000/";
+    }, 1500);
+//   document.cookie = `token=${loginResult.token}; path=/;`;
 };
 
 },{"./alerts.js":"j4hQk","@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"j4hQk":[function(require,module,exports) {
@@ -627,6 +657,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "hideAlert", ()=>hideAlert);
 parcelHelpers.export(exports, "showAlert", ()=>showAlert);
+parcelHelpers.export(exports, "errorCatcher", ()=>errorCatcher);
 let scheduledHide;
 const hideAlert = function() {
     var _alertElement_parentElement;
@@ -642,6 +673,14 @@ const showAlert = function(type, message) {
     scheduledHide = setTimeout(()=>{
         hideAlert();
     }, 1500);
+};
+const errorCatcher = async function(func, ...argsInput) {
+    try {
+        showAlert("success", "Please wait...");
+        return await func(...argsInput);
+    } catch (error) {
+        showAlert("error", error.message);
+    }
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"5Birt":[function(require,module,exports) {
@@ -736,6 +775,42 @@ const error = function(statusCode) {
             window.location.href = "/login";
         }, 3000);
     }
+};
+
+},{"./alerts":"j4hQk","@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}],"cfrxY":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "updateData", ()=>updateData);
+parcelHelpers.export(exports, "updatePassword", ()=>updatePassword);
+var _alerts = require("./alerts");
+const updateData = async function(payload) {
+    const body = JSON.stringify(payload);
+    const updateResponse = await fetch("http://localhost:3000/api/v1/users/updateMyInfo", {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "PATCH",
+        body
+    });
+    const updateResult = await updateResponse.json();
+    if (updateResult.status !== "success") throw updateResult;
+    (0, _alerts.showAlert)("success", "Updated Data Successfully");
+//   setTimeout(() => {
+//     window.location.href = 'http://localhost:3000/me';
+//   }, 1500);
+};
+const updatePassword = async function(payload) {
+    const body = JSON.stringify(payload);
+    const updateResponse = await fetch("http://localhost:3000/api/v1/users/updatePassword", {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "PATCH",
+        body
+    });
+    const updateResult = await updateResponse.json();
+    if (updateResult.status !== "success") throw updateResult;
+    (0, _alerts.showAlert)("success", "Updated Data Successfully");
 };
 
 },{"./alerts":"j4hQk","@parcel/transformer-js/src/esmodule-helpers.js":"5Birt"}]},["dcOb1","4uyBp"], "4uyBp", "parcelRequirebe6c")
