@@ -8,6 +8,7 @@ import {
   updateMyInfo,
   deleteMyAccount,
   setID,
+  uploadPhoto,
 } from '../controllers/userController.js';
 import {
   login,
@@ -34,7 +35,7 @@ router.patch('/resetPassword/:token', passwordReset);
 router.use(protect);
 
 router.patch('/updatePassword', passwordUpdate);
-router.patch('/updateMyInfo', updateMyInfo);
+router.patch('/updateMyInfo', uploadPhoto, updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
 router.get('/logout', logout);

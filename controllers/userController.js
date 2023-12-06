@@ -3,6 +3,24 @@ import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import { filterObject } from '../utils/objectFunctions.js';
 import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
+import multer from 'multer';
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/img/users');
+    },
+    filename: (req, file, cb) => {
+        const extension = file.mimetype.split('/')[1];
+        cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
+    },
+});
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        return cb(null, true);
+    }
+    cb(new CustomError('File is not an image.', 400));
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+export const uploadPhoto = upload.single('photo');
 // export const getAllUsers = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     let users = await User.find();
@@ -20,11 +38,15 @@ import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericContr
 //   }
 // );
 export const updateMyInfo = catchAsync(async function (req, res, next) {
-    console.log(req.body, 'BODY******');
+    console.log(req.file);
+    console.log(req.body);
     if (req.body.password || req.body.passwordConfirm) {
         throw new CustomError("You can't change password here", 400);
     }
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, filterObject(req.body, 'name', 'email'), {
+    const filteredInfo = filterObject(req.body, 'name', 'email');
+    if (req.file)
+        filteredInfo.photo = req.file.filename;
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredInfo, {
         new: true,
         runValidators: true,
     });
