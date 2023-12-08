@@ -11,6 +11,44 @@ import {
   updateOne,
 } from './genericController.js';
 
+import multer from 'multer';
+import sharp from 'sharp';
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (
+  req: Request,
+  file: Express.Multer.File,
+  cb: Function
+) => {
+  if (file.mimetype.startsWith('image')) {
+    return cb(null, true);
+  }
+
+  cb(new CustomError('File is not an image.', 400));
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+export const uploadPhoto = upload.fields([
+  {
+    name: 'imageCover',
+    maxCount: 1,
+  },
+  {
+    name: 'images',
+    maxCount: 3,
+  },
+]);
+
+export const resizeTourImages = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  console.log(req.files);
+  next();
+});
 // export const getTour = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     const tour = await Tour.findById(req.params.id).populate({

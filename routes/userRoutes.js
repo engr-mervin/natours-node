@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllUsers, createUser, getUser, updateUser, deleteUser, updateMyInfo, deleteMyAccount, setID, uploadPhoto, } from '../controllers/userController.js';
+import { getAllUsers, createUser, getUser, updateUser, deleteUser, updateMyInfo, deleteMyAccount, setID, uploadPhoto, resizeUserPhoto, } from '../controllers/userController.js';
 import { login, logout, passwordForgotten, passwordReset, passwordUpdate, protect, restrict, signup, } from '../controllers/authController.js';
 import { ROLE_ADMIN } from '../utils/access-constants.js';
 import { removeFields } from '../controllers/genericController.js';
@@ -12,7 +12,7 @@ router.patch('/resetPassword/:token', passwordReset);
 //protected routes
 router.use(protect);
 router.patch('/updatePassword', passwordUpdate);
-router.patch('/updateMyInfo', uploadPhoto, updateMyInfo);
+router.patch('/updateMyInfo', uploadPhoto, resizeUserPhoto, updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
 router.get('/logout', logout);

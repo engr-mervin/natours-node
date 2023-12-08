@@ -600,12 +600,24 @@ const updateUserDataForm = document.querySelector(".form-user-data");
 if (updateUserDataForm) {
     const email = document.getElementById("email");
     const name = document.getElementById("name");
+    const photo = document.getElementById("photo");
+    if (photo) photo.addEventListener("change", function(e) {
+        var _this_files, _this;
+        const img = document.querySelector(".form__user-photo");
+        if (!((_this = this) === null || _this === void 0 ? void 0 : (_this_files = _this.files) === null || _this_files === void 0 ? void 0 : _this_files.length)) return;
+        img.src = URL.createObjectURL(this.files[0]);
+        img.onload = function() {
+            URL.revokeObjectURL(img.src);
+        };
+    });
     updateUserDataForm.addEventListener("submit", (event)=>{
         event.preventDefault();
-        (0, _alertsJs.errorCatcher)((0, _updateInfoJs.updateData), {
-            name: (name === null || name === void 0 ? void 0 : name.value) || "",
-            email: (email === null || email === void 0 ? void 0 : email.value) || ""
-        });
+        const form = new FormData();
+        form.append("name", name.value);
+        form.append("email", email.value);
+        console.log(photo.files);
+        if ((photo === null || photo === void 0 ? void 0 : photo.files) && photo.files[0]) form.append("photo", photo.files[0]);
+        (0, _alertsJs.errorCatcher)((0, _updateInfoJs.updateData), form);
     });
 }
 const updatePasswordForm = document.querySelector(".form-user-settings");
@@ -784,20 +796,16 @@ parcelHelpers.export(exports, "updateData", ()=>updateData);
 parcelHelpers.export(exports, "updatePassword", ()=>updatePassword);
 var _alerts = require("./alerts");
 const updateData = async function(payload) {
-    const body = JSON.stringify(payload);
     const updateResponse = await fetch("http://localhost:3000/api/v1/users/updateMyInfo", {
-        headers: {
-            "Content-Type": "application/json"
-        },
         method: "PATCH",
-        body
+        body: payload
     });
     const updateResult = await updateResponse.json();
     if (updateResult.status !== "success") throw updateResult;
     (0, _alerts.showAlert)("success", "Updated Data Successfully");
-//   setTimeout(() => {
-//     window.location.href = 'http://localhost:3000/me';
-//   }, 1500);
+    setTimeout(()=>{
+        window.location.href = "http://localhost:3000/me";
+    }, 1500);
 };
 const updatePassword = async function(payload) {
     const body = JSON.stringify(payload);

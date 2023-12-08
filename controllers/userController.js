@@ -4,15 +4,17 @@ import { CustomError } from '../classes/customError.js';
 import { filterObject } from '../utils/objectFunctions.js';
 import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
 import multer from 'multer';
-const multerStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/img/users');
-    },
-    filename: (req, file, cb) => {
-        const extension = file.mimetype.split('/')[1];
-        cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
-    },
-});
+import sharp from 'sharp';
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const extension = file.mimetype.split('/')[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
+//   },
+// });
+const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image')) {
         return cb(null, true);
@@ -39,7 +41,6 @@ export const uploadPhoto = upload.single('photo');
 // );
 export const updateMyInfo = catchAsync(async function (req, res, next) {
     console.log(req.file);
-    console.log(req.body);
     if (req.body.password || req.body.passwordConfirm) {
         throw new CustomError("You can't change password here", 400);
     }
@@ -56,6 +57,17 @@ export const updateMyInfo = catchAsync(async function (req, res, next) {
             updatedUser,
         },
     });
+});
+export const resizeUserPhoto = catchAsync(async function (req, res, next) {
+    if (!req.file)
+        return next();
+    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+        .resize(500, 500)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/users/${req.file.filename}`);
+    next();
 });
 export const deleteMyAccount = catchAsync(async function (req, res, next) {
     //get user from req.user

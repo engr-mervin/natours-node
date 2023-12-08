@@ -12,16 +12,19 @@ import {
 } from './genericController.js';
 
 import multer from 'multer';
+import sharp from 'sharp';
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'public/img/users');
-  },
-  filename: (req, file, cb) => {
-    const extension = file.mimetype.split('/')[1];
-    cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
-  },
-});
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'public/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const extension = file.mimetype.split('/')[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${extension}`);
+//   },
+// });
+
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = (
   req: Request,
@@ -63,7 +66,7 @@ export const updateMyInfo = catchAsync(async function (
   next: NextFunction
 ) {
   console.log(req.file);
-  console.log(req.body);
+
   if (req.body.password || req.body.passwordConfirm) {
     throw new CustomError("You can't change password here", 400);
   }
@@ -89,6 +92,23 @@ export const updateMyInfo = catchAsync(async function (
   });
 });
 
+export const resizeUserPhoto = catchAsync(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.file.filename}`);
+
+  next();
+});
 export const deleteMyAccount = catchAsync(async function (
   req: Request,
   res: Response,

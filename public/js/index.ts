@@ -30,12 +30,38 @@ const updateUserDataForm = document.querySelector('.form-user-data');
 if (updateUserDataForm) {
   const email = document.getElementById('email') as HTMLInputElement;
   const name = document.getElementById('name') as HTMLInputElement;
+
+  const photo = document.getElementById('photo') as HTMLInputElement;
+
+  if (photo) {
+    photo.addEventListener('change', function (e) {
+      const img = document.querySelector(
+        '.form__user-photo'
+      ) as HTMLImageElement;
+      if (!this?.files?.length) return;
+
+      img.src = URL.createObjectURL(this.files[0]);
+
+      img.onload = function () {
+        URL.revokeObjectURL(img.src);
+      };
+    });
+  }
+
   updateUserDataForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    errorCatcher(updateData, {
-      name: name?.value || '',
-      email: email?.value || '',
-    });
+
+    const form = new FormData();
+
+    form.append('name', name.value);
+    form.append('email', email.value);
+
+    console.log(photo.files);
+
+    if (photo?.files && photo.files[0]) {
+      form.append('photo', photo.files[0]);
+    }
+    errorCatcher(updateData, form);
   });
 }
 

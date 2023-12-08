@@ -1,15 +1,11 @@
 import { showAlert } from './alerts';
 
-export const updateData = async function (payload: Record<string, any>) {
-  const body = JSON.stringify(payload);
+export const updateData = async function (payload: FormData) {
   const updateResponse = await fetch(
     'http://localhost:3000/api/v1/users/updateMyInfo',
     {
-      headers: {
-        'Content-Type': 'application/json',
-      },
       method: 'PATCH',
-      body,
+      body: payload,
     }
   );
 
@@ -19,9 +15,9 @@ export const updateData = async function (payload: Record<string, any>) {
 
   showAlert('success', 'Updated Data Successfully');
 
-  //   setTimeout(() => {
-  //     window.location.href = 'http://localhost:3000/me';
-  //   }, 1500);
+  setTimeout(() => {
+    window.location.href = 'http://localhost:3000/me';
+  }, 1500);
 };
 
 export const updatePassword = async function (payload: Record<string, any>) {

@@ -2,6 +2,29 @@ import Tour from '../models/tourModel.js';
 import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
+import multer from 'multer';
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image')) {
+        return cb(null, true);
+    }
+    cb(new CustomError('File is not an image.', 400));
+};
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+export const uploadPhoto = upload.fields([
+    {
+        name: 'imageCover',
+        maxCount: 1,
+    },
+    {
+        name: 'images',
+        maxCount: 3,
+    },
+]);
+export const resizeTourImages = catchAsync(async function (req, res, next) {
+    console.log(req.files);
+    next();
+});
 // export const getTour = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     const tour = await Tour.findById(req.params.id).populate({

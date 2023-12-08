@@ -9,6 +9,7 @@ import {
   deleteMyAccount,
   setID,
   uploadPhoto,
+  resizeUserPhoto,
 } from '../controllers/userController.js';
 import {
   login,
@@ -35,7 +36,7 @@ router.patch('/resetPassword/:token', passwordReset);
 router.use(protect);
 
 router.patch('/updatePassword', passwordUpdate);
-router.patch('/updateMyInfo', uploadPhoto, updateMyInfo);
+router.patch('/updateMyInfo', uploadPhoto, resizeUserPhoto, updateMyInfo);
 router.delete('/deleteMyAccount', deleteMyAccount);
 router.get('/', restrict([ROLE_ADMIN]), getAllUsers);
 router.get('/logout', logout);

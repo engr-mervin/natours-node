@@ -10,6 +10,8 @@ import {
   getMonthlyPlan,
   getToursWithin,
   getDistances,
+  uploadPhoto,
+  resizeTourImages,
 } from '../controllers/tourController.js';
 import { protect, restrict } from '../controllers/authController.js';
 import {
@@ -45,7 +47,7 @@ router.route('/stats').get(getTourStats);
 router
   .route('/:tourId')
   .get(getTour)
-  .patch(updateTour)
+  .patch(uploadPhoto, resizeTourImages, updateTour)
   .delete(protect, restrict(DELETE_ACCESS), deleteTour);
 
 router
