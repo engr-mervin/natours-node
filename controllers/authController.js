@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
+import { Emailer } from '../utils/email.js';
 import crypto from 'crypto';
 const signToken = function (id) {
     return jwt.sign({ id }, process.env.JSONWEBTOKEN_SECRET, {
@@ -34,6 +35,10 @@ export const signup = catchAsync(async function (req, res, next) {
         password: req.body.password,
         passwordConfirm: req.body.passwordConfirm,
     });
+    const url = `${req.protocol}://${req.get('host')}/me/`;
+    console.log(url);
+    const emailer = new Emailer(newUser, url);
+    await emailer.sendWelcome();
     createSendToken(newUser, 201, res);
 });
 export const login = catchAsync(async function (req, res, next) {
@@ -165,8 +170,10 @@ export const passwordForgotten = catchAsync(async function (req, res, next) {
     const resetToken = await user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
     //send it to users email
-    const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+    const resetURL = `${req.protocol}://localhost:3000/api/v1/users/resetPassword/${resetToken}`;
+    const emailer = new Emailer(user, resetURL);
     try {
+        await emailer.sendPasswordReset();
         res.status(200).json({
             status: 'success',
             message: 'Token sent to email!',

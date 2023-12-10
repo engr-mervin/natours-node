@@ -8,3 +8,5 @@ export const TOURS_SIMPLE: string = `${__rootdirname}${sep}dev-data${sep}data${s
 export const STATIC_FOLDER: string = `${__rootdirname}${sep}public`;
 
 export const VIEW_FOLDER: string = `${__rootdirname}${sep}views`;
+
+export const EMAIL_TEMPLATES: string = `${VIEW_FOLDER}/emails`;
