@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { CustomError } from '../classes/customError.js';
 import { validator } from '../utils/validators.js';
 import { EMAIL_REGEX } from '../utils/constants.js';
-import { sendEmail } from '../utils/email.js';
+import { Email, sendEmail } from '../utils/email.js';
 import crypto from 'crypto';
 
 const signToken = function (id: any) {
@@ -281,14 +281,17 @@ export const passwordForgotten = catchAsync(async function (
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}\nIf you didn't forget your password, please ignore this email!`;
+  const emailer = new Email(user);
+
+  //   const message = `Forgot password? Submit a PATCH request with your new password and passwordConfirm to ${resetURL}\nIf you didn't forget your password, please ignore this email!`;
 
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password reset token valid for 10 mins.',
-      message,
-    });
+    //  await sendEmail({
+    //    email: user.email,
+    //    subject: 'Your password reset token valid for 10 mins.',
+    //    message,
+    //  });
+    await emailer.sendResetPassword(resetURL);
 
     res.status(200).json({
       status: 'success',

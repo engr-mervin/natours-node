@@ -3,6 +3,7 @@ import { catchAsync } from '../utils/routerFunctions.js';
 import { CustomError } from '../classes/customError.js';
 import { createOne, deleteOne, getAll, getOne, updateOne, } from './genericController.js';
 import multer from 'multer';
+import sharp from 'sharp';
 const multerStorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
     if (file.mimetype.startsWith('image')) {
@@ -22,9 +23,36 @@ export const uploadPhoto = upload.fields([
     },
 ]);
 export const resizeTourImages = catchAsync(async function (req, res, next) {
-    console.log(req.files);
+    const files = req.files;
+    if (files?.imageCover) {
+        const fileName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+        await resizeTourImage(files.imageCover[0], fileName);
+        req.body.imageCover = fileName;
+    }
+    if (files?.images && files?.images.length > 0) {
+        const resizeProcesses = [];
+        const fileNames = [];
+        for (let i = 0; i < files.images.length; i++) {
+            const fileName = `tour-${req.params.tourId}-${Date.now()}-${i}.jpeg`;
+            resizeProcesses.push(resizeTourImage(files.images[i], fileName));
+            fileNames.push(fileName);
+        }
+        const resizeResults = await Promise.allSettled(resizeProcesses);
+        for (let i = 0; i < resizeResults.length; i++) {
+            if (resizeResults[i].status === 'fulfilled') {
+                req.body.images.push(fileNames[i]);
+            }
+        }
+    }
     next();
 });
+const resizeTourImage = async function (image, fileName) {
+    await sharp(image.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${fileName}`);
+};
 // export const getTour = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     const tour = await Tour.findById(req.params.id).populate({
