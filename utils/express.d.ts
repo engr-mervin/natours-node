@@ -1,6 +1,7 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongoose';
 import { Multer } from 'multer';
+import SMTPConnection from 'nodemailer/lib/smtp-connection';
 
 export enum Roles {
   Admin = 'admin',
@@ -15,6 +16,14 @@ declare global {
       payload: { [key: string]: any };
       user: any;
       filterObj: any;
+    }
+  }
+}
+
+declare global {
+  namespace SMTPConnection {
+    interface TransportOptions {
+      host?: string;
     }
   }
 }
