@@ -1,0 +1,37 @@
+import { catchAsync } from '../utils/routerFunctions.js';
+import Tour from '../models/tourModel.js';
+import { CustomError } from '../classes/customError.js';
+import Stripe from 'stripe';
+const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const getCheckoutSession = catchAsync(async function (req, res, next) {
+    const tour = await Tour.findById(req.params.tourId);
+    if (!tour)
+        throw new CustomError('Tour not found', 404);
+    const session = await stripeClient.checkout.sessions.create({
+        payment_method_types: ['card'],
+        success_url: `${req.protocol}://localhost:3000/`,
+        cancel_url: `${req.protocol}://localhost:3000/tour/${tour.slug}`,
+        mode: 'payment',
+        customer_email: req.user.email,
+        client_reference_id: req.params.tourId,
+        line_items: [
+            {
+                price_data: {
+                    currency: 'usd',
+                    unit_amount: tour.price * 100,
+                    product_data: {
+                        name: `${tour.name} Tour`,
+                        description: tour.summary,
+                        images: ['https://www.natours.dev/img/tours/tour-1-cover.jpg'],
+                    },
+                },
+                quantity: 1,
+            },
+        ],
+    });
+    console.log(session);
+    res.status(200).json({
+        status: 'success',
+        session,
+    });
+});

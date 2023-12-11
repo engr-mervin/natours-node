@@ -33,7 +33,7 @@ const reviewSchema = new Schema(
     user: {
       type: Schema.ObjectId,
       ref: 'User',
-      required: 'A review must have an author',
+      required: [true, 'A review must have an author'],
     },
   },
   {

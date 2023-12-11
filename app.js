@@ -13,6 +13,7 @@ import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
+import bookingRouter from './routes/bookingRoutes.js';
 const app = express();
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
 const styleSrcUrls = [
@@ -94,6 +95,7 @@ app.use('*', async function (req, res, next) {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 app.all('/api/*', (req, res, next) => {
     const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
     next(err);
