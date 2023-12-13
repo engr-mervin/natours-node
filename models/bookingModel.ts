@@ -1,5 +1,6 @@
 //@ts-nocheck
 import { Schema, model } from 'mongoose';
+import { registerOrigin } from '../utils/query-helpers.js';
 
 const bookingSchema = new Schema({
   tour: {
@@ -26,6 +27,8 @@ const bookingSchema = new Schema({
   },
 });
 
+bookingSchema.pre(/^find/, registerOrigin('booking'));
+
 bookingSchema.pre(/^find/, function (next) {
   this.populate('user').populate({
     path: 'tour',
@@ -35,4 +38,6 @@ bookingSchema.pre(/^find/, function (next) {
   next();
 });
 
-const Book = model('Booking', bookingSchema);
+const Booking = model('Booking', bookingSchema);
+
+export default Booking;

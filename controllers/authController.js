@@ -117,6 +117,7 @@ export const protectPage = catchAsyncPage(async function (req, res, next) {
         throw new CustomError('Token is no longer valid. Please log in again.', 401);
     }
     res.locals.user = candidateUser;
+    req.user = candidateUser;
     next();
 });
 export const logout = catchAsync(async function (req, res, next) {

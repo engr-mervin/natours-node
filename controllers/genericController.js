@@ -111,6 +111,3 @@ export const getAll = function (Model) {
         });
     });
 };
-export const cleanData = function (deleteFields) {
-    return catchAsync(async function (req, res, next) { });
-};

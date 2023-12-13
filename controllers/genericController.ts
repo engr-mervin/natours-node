@@ -168,11 +168,3 @@ export const getAll = function (Model: Model<any>) {
     });
   });
 };
-
-export const cleanData = function (deleteFields: string[]) {
-  return catchAsync(async function (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {});
-};

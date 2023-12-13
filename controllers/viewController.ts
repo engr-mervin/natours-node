@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { catchAsyncPage } from '../utils/routerFunctions.js';
 import Tour from '../models/tourModel.js';
 import { CustomError } from '../classes/customError.js';
+import Booking from '../models/bookingModel.js';
 
 // export const renderHome = catchAsync(async function (
 //   req: Request,
@@ -90,4 +91,18 @@ export const renderAccount = catchAsyncPage(async function (
       if (error) throw new CustomError('Something went wrong', 500);
       res.send(html);
     });
+});
+
+export const renderMyTours = catchAsyncPage(async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const bookings = await Booking.find({ user: req.user.id });
+
+  const tourIds = bookings.map((booking) => booking.tour);
+
+  const tours = await Tour.find({ _id: { $in: tourIds } });
+
+  res.status(200).render('overview', { title: 'My Tours', tours });
 });

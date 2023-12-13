@@ -191,6 +191,7 @@ export const protectPage = catchAsyncPage(async function (
 
   res.locals.user = candidateUser;
 
+  req.user = candidateUser;
   next();
 });
 

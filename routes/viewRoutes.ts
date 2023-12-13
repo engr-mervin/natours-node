@@ -5,22 +5,24 @@ import {
   renderLogin,
   renderFallback,
   renderAccount,
+  renderMyTours,
 } from '../controllers/viewController.js';
 import {
   isLoggedIn,
   logout,
   protectPage,
 } from '../controllers/authController.js';
+import { createBookingCheckout } from '../controllers/bookingController.js';
 
 const router = Router();
 router.use(isLoggedIn);
 router.get('/login', renderLogin);
 router.get('/logout', logout);
-router.get('/', renderOverview);
+router.get('/', createBookingCheckout, renderOverview);
 
-router.use(protectPage);
+router.get('/tour/:tourSlug', protectPage, renderTours);
+router.get('/me', protectPage, renderAccount);
+router.get('/my-tours', protectPage, renderMyTours);
 
-router.get('/tour/:tourSlug', renderTours);
-router.get('/me', renderAccount);
 router.all('*', renderFallback);
 export default router;
