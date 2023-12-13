@@ -45,13 +45,13 @@ export const uploadPhoto = upload.single('photo');
 //   async (req: Request, res: Response, next: NextFunction) => {
 //     let users = await User.find();
 
-//     console.log(users);
+//
 //     const usersCleaned = JSON.parse(JSON.stringify(users)).map((el: any) => {
 //       if (el.passwordChangedAt) delete el.passwordChangedAt;
 //       return el;
 //     });
 
-//     console.log(usersCleaned);
+//
 //     res.status(200).json({
 //       status: 'success',
 //       results: users.length,
@@ -65,8 +65,6 @@ export const updateMyInfo = catchAsync(async function (
   res: Response,
   next: NextFunction
 ) {
-  console.log(req.file);
-
   if (req.body.password || req.body.passwordConfirm) {
     throw new CustomError("You can't change password here", 400);
   }

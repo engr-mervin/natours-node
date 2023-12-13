@@ -29,6 +29,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/compression": "^1.7.5",
     "@types/cookie-parser": "^1.4.6",
     "@types/express-rate-limit": "^6.0.0",
     "@types/helmet": "^4.0.0",
@@ -41,6 +42,7 @@
     "@types/nodemailer": "^6.4.11",
     "@types/stripe": "^8.0.417",
     "argon2": "^0.31.1",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",
     "express-mongo-sanitize": "^2.2.0",

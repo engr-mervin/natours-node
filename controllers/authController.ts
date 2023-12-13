@@ -51,7 +51,7 @@ export const signup = catchAsync(async function (
     passwordConfirm: req.body.passwordConfirm,
   });
   const url = `${req.protocol}://${req.get('host')}/me/`;
-  console.log(url);
+
   const emailer = new Emailer(newUser, url);
   await emailer.sendWelcome();
 

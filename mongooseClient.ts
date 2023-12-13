@@ -7,9 +7,6 @@ const connectionString = process.env.DATABASE_CONNECTION_STRING!.replace(
 
 try {
   await mongoose.connect(connectionString);
-  console.log('Successfully connected to database.');
-} catch (error) {
-  console.log('Error connecting to database.');
-}
+} catch (error) {}
 
 export default mongoose;

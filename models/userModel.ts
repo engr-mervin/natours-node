@@ -116,7 +116,7 @@ userSchema.methods.passwordUpdate = async function (password, passwordConfirm) {
 userSchema.methods.passwordModifiedAfter = async function (jwtStamp: Date) {
   if (this.passwordChangedAt) {
     const timeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
-    console.log(timeStamp, jwtStamp);
+
     if (timeStamp > jwtStamp) return true;
   }
   return false;
@@ -132,7 +132,6 @@ userSchema.methods.createPasswordResetToken = async function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.passwordResetToken);
   this.passwordResetExpires = Date.now() + 5 * 60 * 1000;
 
   return resetToken;

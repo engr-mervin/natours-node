@@ -40,8 +40,6 @@ export const getCheckoutSession = catchAsync(async function (
     ],
   });
 
-  console.log(session);
-
   res.status(200).json({
     status: 'success',
     session,

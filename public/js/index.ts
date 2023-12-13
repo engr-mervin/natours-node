@@ -29,7 +29,7 @@ if (loginForm) {
   const email = document.getElementById('email') as HTMLInputElement;
   loginForm?.addEventListener('submit', (event) => {
     event.preventDefault();
-    console.log('login');
+
     errorCatcher(login, email.value, password.value);
   });
 }
@@ -67,8 +67,6 @@ if (updateUserDataForm) {
 
     form.append('name', name.value);
     form.append('email', email.value);
-
-    console.log(photo.files);
 
     if (photo?.files && photo.files[0]) {
       form.append('photo', photo.files[0]);

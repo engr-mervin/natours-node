@@ -290,7 +290,6 @@ export const getMonthlyPlan = catchAsync(async function (
       $sort: { month: 1 },
     },
   ]);
-  console.log(year);
 
   res.status(200).json({
     status: 'success',

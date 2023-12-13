@@ -16,6 +16,7 @@ import hpp from 'hpp';
 
 import cookieParser from 'cookie-parser';
 import bookingRouter from './routes/bookingRoutes.js';
+import compression from 'compression';
 
 const app = express();
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
@@ -91,19 +92,21 @@ app.use(
   })
 );
 
+app.use(compression());
+
 app.set('view engine', 'pug');
 app.set('views', VIEW_FOLDER);
 //Static folder
 app.use(express.static(STATIC_FOLDER));
 
 // app.use((req: Request, res: Response, next: NextFunction) => {
-//   console.log('Hello from the middleware 👌');
+//
 //   next();
 // });
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   req.requestTime = new Date().toISOString();
-  console.log(req.cookies);
+
   next();
 });
 app.use('*', async function (req: Request, res: Response, next: NextFunction) {

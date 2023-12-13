@@ -33,9 +33,7 @@ const uploadTours = async () => {
     await Tour.create(tours);
     await User.create(users);
     await Review.create(reviews);
-    console.log('Successfully uploaded tours');
   } catch (error) {
-    console.log(error);
   } finally {
     process.exit();
   }
@@ -46,15 +44,12 @@ const deleteTours = async () => {
     await Tour.deleteMany();
     await User.deleteMany();
     await Review.deleteMany();
-    console.log('Successfully deleted DB');
   } catch (error) {
-    console.log(error);
   } finally {
     process.exit();
   }
 };
 
-console.log(process.argv);
 if (process.argv[2] === '--delete') {
   deleteTours();
 } else {
