@@ -14,6 +14,7 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import bookingRouter from './routes/bookingRoutes.js';
+import compression from 'compression';
 const app = express();
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
 const styleSrcUrls = [
@@ -79,6 +80,7 @@ app.use(
     ],
   })
 );
+app.use(compression());
 app.set('view engine', 'pug');
 app.set('views', VIEW_FOLDER);
 //Static folder
@@ -89,7 +91,6 @@ app.use(express.static(STATIC_FOLDER));
 // });
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-
   next();
 });
 app.use('*', async function (req, res, next) {
@@ -109,4 +110,5 @@ app.all('/api/*', (req, res, next) => {
 //PAGES
 app.use('/', viewRouter);
 app.use(errorHandler);
+
 export default app;

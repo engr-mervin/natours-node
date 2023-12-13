@@ -7,7 +7,9 @@ process.on('uncaughtException', (err) => {
 
 const port = process.env.PORT || 3000;
 
-const server = app.listen(port, () => {});
+const server = app.listen(port, () => {
+  console.log(`Application running on PORT ${port}`);
+});
 
 process.on('unhandledRejection', (err: Error) => {
   server.close(() => {

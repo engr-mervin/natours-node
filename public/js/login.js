@@ -4,7 +4,7 @@ export const login = async function (email, password) {
         email: email || '',
         password: password || '',
     });
-    const loginRequest = await fetch('http://localhost:3000/api/v1/users/login', {
+    const loginRequest = await fetch(`${process.env.DEV_URL}/api/v1/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
@@ -15,7 +15,7 @@ export const login = async function (email, password) {
     }
     showAlert('success', 'Logged in successfully');
     setTimeout(() => {
-        window.location.href = 'http://localhost:3000/';
+        window.location.href = `${process.env.DEV_URL}/`;
     }, 1500);
     //   document.cookie = `token=${loginResult.token}; path=/;`;
 };

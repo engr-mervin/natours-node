@@ -1,6 +1,6 @@
 import { showAlert } from './alerts';
 export const updateData = async function (payload) {
-    const updateResponse = await fetch('http://localhost:3000/api/v1/users/updateMyInfo', {
+    const updateResponse = await fetch(`${process.env.DEV_URL}/api/v1/users/updateMyInfo`, {
         method: 'PATCH',
         body: payload,
     });
@@ -9,12 +9,12 @@ export const updateData = async function (payload) {
         throw updateResult;
     showAlert('success', 'Updated Data Successfully');
     setTimeout(() => {
-        window.location.href = 'http://localhost:3000/me';
+        window.location.href = `${process.env.DEV_URL}/me`;
     }, 1500);
 };
 export const updatePassword = async function (payload) {
     const body = JSON.stringify(payload);
-    const updateResponse = await fetch('http://localhost:3000/api/v1/users/updatePassword', {
+    const updateResponse = await fetch(`${process.env.DEV_URL}/api/v1/users/updatePassword`, {
         headers: {
             'Content-Type': 'application/json',
         },

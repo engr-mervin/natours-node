@@ -1,5 +1,5 @@
 export const proceedToCheckout = async function (id) {
-    const getCheckoutPage = await fetch(`http://localhost:3000/api/v1/bookings/checkout-session/${id}`, {
+    const getCheckoutPage = await fetch(`${process.env.DEV_URL}/api/v1/bookings/checkout-session/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
