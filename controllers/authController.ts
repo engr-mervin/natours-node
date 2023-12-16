@@ -17,6 +17,7 @@ const signToken = function (id: any) {
 const createSendToken = function (
   user: any,
   statusCode: number,
+  req: Request,
   res: Response
 ) {
   const token = signToken(user._id);
@@ -25,7 +26,7 @@ const createSendToken = function (
 
   const cookieOptions = {
     expires: new Date(Date.now() + expiry * 86400 * 1000),
-    secure: process.env.NODE_ENV === 'production',
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
     httpOnly: true,
   };
 
@@ -55,7 +56,7 @@ export const signup = catchAsync(async function (
   const emailer = new Emailer(newUser, url);
   await emailer.sendWelcome();
 
-  createSendToken(newUser, 201, res);
+  createSendToken(newUser, 201, req, res);
 });
 
 export const login = catchAsync(async function (
@@ -93,7 +94,7 @@ export const login = catchAsync(async function (
 
   //if it exists send a JWT
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });
 
 export const protect = catchAsync(async function (
@@ -395,5 +396,5 @@ export const passwordUpdate = catchAsync(async function (
   user.passwordConfirm = req.body.passwordConfirm;
   await user.save();
 
-  createSendToken(user, 200, res);
+  createSendToken(user, 200, req, res);
 });

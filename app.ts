@@ -19,6 +19,8 @@ import bookingRouter from './routes/bookingRoutes.js';
 import compression from 'compression';
 
 const app = express();
+app.enable('trust proxy');
+
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
 const styleSrcUrls = [
   'https://unpkg.com/',
