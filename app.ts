@@ -17,6 +17,7 @@ import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import bookingRouter from './routes/bookingRoutes.js';
 import compression from 'compression';
+import cors from 'cors';
 
 const app = express();
 app.enable('trust proxy');
@@ -35,6 +36,9 @@ const connectSrcUrls = [
 ];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
+app.use(cors());
+
+app.options('*', cors());
 //MIDDLEWARES
 
 //Security Headers
