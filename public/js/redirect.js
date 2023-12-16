@@ -1,7 +1,7 @@
 "use strict";
 const redirect = function () {
     setTimeout(() => {
-        window.location.href = `${process.env.DEV_URL}/login`;
+        window.location.href = `${window.location.origin}/login`;
     }, 3000);
 };
 redirect();

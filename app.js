@@ -18,68 +18,62 @@ import compression from 'compression';
 const app = express();
 const scriptSrcUrls = ['https://unpkg.com/', 'https://tile.openstreetmap.org'];
 const styleSrcUrls = [
-  'https://unpkg.com/',
-  'https://tile.openstreetmap.org',
-  'https://fonts.googleapis.com/',
-  'https://tiles.stadiamaps.com',
+    'https://unpkg.com/',
+    'https://tile.openstreetmap.org',
+    'https://fonts.googleapis.com/',
+    'https://tiles.stadiamaps.com',
 ];
 const connectSrcUrls = [
-  'https://unpkg.com',
-  'https://tile.openstreetmap.org',
-  'ws://localhost:1234',
+    'https://unpkg.com',
+    'https://tile.openstreetmap.org',
+    'ws://localhost:1234',
 ];
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 //MIDDLEWARES
 //Security Headers
-app.use(
-  helmet.contentSecurityPolicy({
+app.use(helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: [],
-      connectSrc: ["'self'", ...connectSrcUrls],
-      scriptSrc: ["'self'", ...scriptSrcUrls],
-      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-      workerSrc: ["'self'", 'blob:'],
-      objectSrc: [],
-      imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
-      fontSrc: ["'self'", ...fontSrcUrls],
+        defaultSrc: [],
+        connectSrc: ["'self'", ...connectSrcUrls],
+        scriptSrc: ["'self'", ...scriptSrcUrls],
+        styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+        workerSrc: ["'self'", 'blob:'],
+        objectSrc: [],
+        imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
+        fontSrc: ["'self'", ...fontSrcUrls],
     },
-  })
-);
+}));
 //Log actions
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
+    app.use(morgan('dev'));
 }
 app.use(cookieParser());
 //Limit API requests
 const limiter = rateLimit({
-  max: 360,
-  windowMs: 3600000,
-  message: 'Too many requests from this IP, please try again later.',
+    max: 360,
+    windowMs: 3600000,
+    message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api', limiter);
 //Body parser
 app.use(express.json({ limit: '10kb' }));
-app.use(
-  express.urlencoded({
+app.use(express.urlencoded({
     limit: '10kb',
     extended: true,
-  })
-);
+}));
 //sanitizers
 app.use(mongoSanitize());
 app.use(xss());
-app.use(
-  hpp({
+app.use(hpp({
     whitelist: [
-      'duration',
-      'ratingsQuantity',
-      'ratingsAverage',
-      'maxGroupSize',
-      'difficulty',
-      'price',
+        'duration',
+        'ratingsQuantity',
+        'ratingsAverage',
+        'maxGroupSize',
+        'difficulty',
+        'price',
     ],
-  })
-);
+}));
 app.use(compression());
 app.set('view engine', 'pug');
 app.set('views', VIEW_FOLDER);
@@ -90,13 +84,13 @@ app.use(express.static(STATIC_FOLDER));
 //   next();
 // });
 app.use((req, res, next) => {
-  req.requestTime = new Date().toISOString();
-  next();
+    req.requestTime = new Date().toISOString();
+    next();
 });
 app.use('*', async function (req, res, next) {
-  req.filterObj = {};
-  req.user = {};
-  next();
+    req.filterObj = {};
+    req.user = {};
+    next();
 });
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
@@ -104,11 +98,10 @@ app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/bookings', bookingRouter);
 app.all('/api/*', (req, res, next) => {
-  const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
-  next(err);
+    const err = new CustomError(`Can't find ${req.originalUrl} on this server!`);
+    next(err);
 });
 //PAGES
 app.use('/', viewRouter);
 app.use(errorHandler);
-
 export default app;

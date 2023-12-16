@@ -18,6 +18,7 @@
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-compile": "tsc -w -p .",
+    "start-node": "nodemon server.js",
     "start:dev": "SET NODE_ENV=development&&npm-run-all --parallel ts-compile start-node",
     "start:prod": "SET NODE_ENV=production&&npm-run-all --parallel ts-compile start-node",
     "debug": "node --inspect-brk server.js",

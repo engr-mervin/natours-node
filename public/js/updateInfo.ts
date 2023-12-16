@@ -2,7 +2,7 @@ import { showAlert } from './alerts';
 
 export const updateData = async function (payload: FormData) {
   const updateResponse = await fetch(
-    `${process.env.DEV_URL!}/api/v1/users/updateMyInfo`,
+    `${window.location.origin}/api/v1/users/updateMyInfo`,
     {
       method: 'PATCH',
       body: payload,
@@ -16,7 +16,7 @@ export const updateData = async function (payload: FormData) {
   showAlert('success', 'Updated Data Successfully');
 
   setTimeout(() => {
-    window.location.href = `${process.env.DEV_URL!}/me`;
+    window.location.href = `${window.location.origin}/me`;
   }, 1500);
 };
 
@@ -24,7 +24,7 @@ export const updatePassword = async function (payload: Record<string, any>) {
   const body = JSON.stringify(payload);
 
   const updateResponse = await fetch(
-    `${process.env.DEV_URL!}/api/v1/users/updatePassword`,
+    `${window.location.origin}/api/v1/users/updatePassword`,
     {
       headers: {
         'Content-Type': 'application/json',
