@@ -11,12 +11,12 @@ const signToken = function (id) {
         expiresIn: process.env.JSONWEBTOKEN_EXPIRY,
     });
 };
-const createSendToken = function (user, statusCode, res) {
+const createSendToken = function (user, statusCode, req, res) {
     const token = signToken(user._id);
     const expiry = Number(process.env.JWT_COOKIE_EXPIRY) || 90;
     const cookieOptions = {
         expires: new Date(Date.now() + expiry * 86400 * 1000),
-        secure: process.env.NODE_ENV === 'production',
+        secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
         httpOnly: true,
     };
     res.cookie('jwt', token, cookieOptions);
@@ -38,7 +38,7 @@ export const signup = catchAsync(async function (req, res, next) {
     const url = `${req.protocol}://${req.get('host')}/me/`;
     const emailer = new Emailer(newUser, url);
     await emailer.sendWelcome();
-    createSendToken(newUser, 201, res);
+    createSendToken(newUser, 201, req, res);
 });
 export const login = catchAsync(async function (req, res, next) {
     const { email, password } = req.body;
@@ -61,7 +61,7 @@ export const login = catchAsync(async function (req, res, next) {
         throw new CustomError('The password does not match with our records.', 401);
     }
     //if it exists send a JWT
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });
 export const protect = catchAsync(async function (req, res, next) {
     //check request if it contains a JWT
@@ -245,5 +245,5 @@ export const passwordUpdate = catchAsync(async function (req, res, next) {
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
     await user.save();
-    createSendToken(user, 200, res);
+    createSendToken(user, 200, req, res);
 });

@@ -16,3 +16,10 @@ process.on('unhandledRejection', (err: Error) => {
     process.exit(1);
   });
 });
+
+process.on('SIGTERM', () => {
+  console.log('Sigterm Signal, shutting down...');
+  server.close(() => {
+    console.log('Server Terminated!');
+  });
+});
