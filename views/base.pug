@@ -9,7 +9,7 @@ html
          meta(charset='UTF-8')
          meta(name='viewport',content='width=device-width,initial-scale=1.0')
          script(src="/js/bundled/index.js",defer)
-   body
+   body(data-alert=`${alert?alert||''}`)
       include _header
       block content 
          h1 This is a block

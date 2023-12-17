@@ -3,10 +3,10 @@ import { NextFunction, Request, Response } from 'express';
 import { catchAsync } from '../utils/routerFunctions.js';
 import Tour from '../models/tourModel.js';
 import { CustomError } from '../classes/customError.js';
-import Stripe from 'stripe';
 import Booking from '../models/bookingModel.js';
-
-const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY!);
+import { stripeClient } from '../services/stripe.js';
+import Stripe from 'stripe';
+import User from '../models/userModel.js';
 
 export const getCheckoutSession = catchAsync(async function (
   req: Request,
@@ -19,9 +19,10 @@ export const getCheckoutSession = catchAsync(async function (
 
   const session = await stripeClient.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${process.env.DEV_URL!}/?tour=${req.params.tourId}&user=${
+    /*success_url: `${process.env.DEV_URL!}/?tour=${req.params.tourId}&user=${
       req.user.id
-    }&price=${tour.price}`,
+    }&price=${tour.price}`,*/
+    success_url: `${process.env.DEV_URL!}/my-tours?alert=booking`,
     cancel_url: `${process.env.DEV_URL!}/tour/${tour.slug}`,
     mode: 'payment',
     customer_email: req.user.email,
@@ -34,7 +35,7 @@ export const getCheckoutSession = catchAsync(async function (
           product_data: {
             name: `${tour.name} Tour`,
             description: tour.summary,
-            images: ['https://www.natours.dev/img/tours/tour-1-cover.jpg'],
+            images: [`${process.env.DEV_URL!}/img/tours/${tour.imageCover}`],
           },
         },
         quantity: 1,
@@ -47,6 +48,8 @@ export const getCheckoutSession = catchAsync(async function (
     session,
   });
 });
+
+/*
 
 export const createBookingCheckout = catchAsync(async function (
   req: Request,
@@ -61,3 +64,16 @@ export const createBookingCheckout = catchAsync(async function (
 
   res.redirect(req.originalUrl.split('?')[0]);
 });
+
+*/
+
+export const createBookingCheckout = async function (
+  session: Stripe.Checkout.Session
+) {
+  console.log(session);
+  const user = await User.findOne({ email: session.customer_email })._id;
+  const tour = session.client_reference_id;
+  const price = session.amount_total / 100;
+
+  await Booking.create({ tour, user, price });
+};

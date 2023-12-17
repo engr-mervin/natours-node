@@ -8,7 +8,7 @@ export const hideAlert = function () {
   }
 };
 
-export const showAlert = function (type: string, message: string) {
+export const showAlert = function (type: string, message: string, time = 1.5) {
   if (scheduledHide) {
     clearTimeout(scheduledHide);
   }
@@ -19,7 +19,7 @@ export const showAlert = function (type: string, message: string) {
 
   scheduledHide = setTimeout(() => {
     hideAlert();
-  }, 1500);
+  }, time * 1000);
 };
 
 export const errorCatcher = async function (

@@ -5,7 +5,7 @@ export const hideAlert = function () {
         alertElement.parentElement?.removeChild(alertElement);
     }
 };
-export const showAlert = function (type, message) {
+export const showAlert = function (type, message, time = 1.5) {
     if (scheduledHide) {
         clearTimeout(scheduledHide);
     }
@@ -14,7 +14,7 @@ export const showAlert = function (type, message) {
     document.querySelector('body')?.insertAdjacentHTML('afterbegin', markup);
     scheduledHide = setTimeout(() => {
         hideAlert();
-    }, 1500);
+    }, time * 1000);
 };
 export const errorCatcher = async function (func, ...argsInput) {
     try {

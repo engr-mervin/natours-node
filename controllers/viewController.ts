@@ -3,6 +3,7 @@ import { catchAsyncPage } from '../utils/routerFunctions.js';
 import Tour from '../models/tourModel.js';
 import { CustomError } from '../classes/customError.js';
 import Booking from '../models/bookingModel.js';
+import { alerts } from '../utils/alerts.js';
 
 // export const renderHome = catchAsync(async function (
 //   req: Request,
@@ -104,5 +105,18 @@ export const renderMyTours = catchAsyncPage(async function (
 
   const tours = await Tour.find({ _id: { $in: tourIds } });
 
-  res.status(200).render('overview', { title: 'My Tours', tours });
+  res
+    .status(200)
+    .render('overview', { title: 'My Tours', tours, alert: res.locals.alert });
 });
+
+export const parseAlert = async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  if (!req.query.alert) return next();
+
+  res.locals.alert = alerts[`${req.query.alert}`];
+  next();
+};

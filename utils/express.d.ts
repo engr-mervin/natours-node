@@ -16,6 +16,7 @@ declare global {
       payload: { [key: string]: any };
       user: any;
       filterObj: any;
+      rawBody: Buffer;
     }
   }
 }

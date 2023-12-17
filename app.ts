@@ -4,6 +4,7 @@ import tourRouter from './routes/tourRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import reviewRouter from './routes/reviewRoutes.js';
 import viewRouter from './routes/viewRoutes.js';
+import webhookRouter from './routes/webhookRoutes.js';
 import { STATIC_FOLDER, VIEW_FOLDER, __rootdirname } from './paths.js';
 import { CustomError } from './classes/customError.js';
 import { errorHandler } from './handlers/errorHandler.js';
@@ -74,7 +75,6 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 //Body parser
-app.use(express.json({ limit: '10kb' }));
 app.use(
   express.urlencoded({
     limit: '10kb',
@@ -120,6 +120,10 @@ app.use('*', async function (req: Request, res: Response, next: NextFunction) {
   req.user = {};
   next();
 });
+
+app.use('/webhook', webhookRouter);
+
+app.use(express.json({ limit: '10kb' }));
 
 //ROUTES
 app.use('/api/v1/tours', tourRouter);
